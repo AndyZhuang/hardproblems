@@ -1,0 +1,40 @@
+{
+  "name": "hardproblems",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HardProblems.World — AI-solvable hard problems with on-chain rewards. 64 hard problems across 8 disciplines, blockchain-based points, AI assistant.",
+  "author": "HardProblems.World Contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build:client": "cd client && npm run build",
+    "start:server": "cd server && npm start",
+    "build": "npm run build:client",
+    "start": "npm run build && npm run start:server",
+    "test:e2e": "node e2e_test.cjs",
+    "clean": "rm -rf client/dist server/node_modules client/node_modules node_modules"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your/hardproblems.git"
+  },
+  "keywords": [
+    "ai",
+    "blockchain",
+    "hard-problems",
+    "millennium-prize",
+    "open-source",
+    "education",
+    "ed25519",
+    "react",
+    "express"
+  ]
+}

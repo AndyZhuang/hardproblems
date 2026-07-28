@@ -1,0 +1,22 @@
+{
+  "name": "hardproblems-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend for hardproblems.world - AI-solvable hard problems with blockchain rewards",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "seed": "node src/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.6.1",
+    "helmet": "^8.3.0",
+    "nanoid": "^5.0.7"
+  }
+}

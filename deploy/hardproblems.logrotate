@@ -1,0 +1,15 @@
+# /etc/logrotate.d/hardproblems
+# 每天轮转，保留 14 天，压缩旧日志
+/var/log/hardproblems/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        systemctl reload hardproblems > /dev/null 2>&1 || true
+    endscript
+}
