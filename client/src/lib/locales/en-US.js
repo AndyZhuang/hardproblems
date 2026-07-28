@@ -1,0 +1,196 @@
+// English (US) language pack
+export default {
+  __meta: { code: 'en-US', label: 'English', short: 'EN' },
+
+  common: {
+    yes: 'Yes',
+    no: 'No',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    save: 'Save',
+    submit: 'Submit',
+    loading: 'Loading…',
+    retry: 'Retry',
+    back: 'Back',
+    next: 'Next',
+    prev: 'Previous',
+    search: 'Search',
+    filter: 'Filter',
+    sort: 'Sort',
+    all: 'All',
+    more: 'More',
+    less: 'Less',
+    close: 'Close',
+    edit: 'Edit',
+    delete: 'Delete',
+    copy: 'Copy',
+    share: 'Share',
+    minutesAgo: '{n} min ago',
+    hoursAgo: '{n}h ago',
+    daysAgo: '{n}d ago',
+    online: 'Online',
+    offline: 'Offline'
+  },
+
+  nav: {
+    home: 'Home',
+    problems: 'Problems',
+    leaderboard: 'Leaderboard',
+    chain: 'Chain',
+    login: 'Log in',
+    register: 'Sign up',
+    logout: 'Log out',
+    profile: 'Profile',
+    language: 'Language'
+  },
+
+  home: {
+    title: 'Solve the {n} hardest problems in the world with AI',
+    subtitle: 'From Riemann to room-temperature superconductors, from consciousness to fusion',
+    desc: 'Anyone can use AI to attempt these. Every solution earns {reward}.',
+    reward: 'on-chain HPW points',
+    cta: 'Start solving →',
+    ctaLeaderboard: 'Leaderboard',
+    statsProblems: 'Problems',
+    statsSolved: 'Solutions',
+    statsUsers: 'Solvers',
+    statsRewards: 'HPW paid',
+    categories: '{n} disciplines',
+    categoriesDesc: 'Pick a field to see what humanity has yet to solve',
+    viewAll: 'All problems →',
+    liveOnChain: '{txs} on-chain txs · {blocks} blocks'
+  },
+
+  problems: {
+    title: 'All hard problems',
+    subtitle: '{n} challenges across 8 disciplines',
+    searchPlaceholder: 'Search problems, tags, keywords…',
+    filterCategory: 'Category',
+    filterStatus: 'Status',
+    statusAll: 'All',
+    statusOpen: 'Open',
+    statusPartial: 'Partial',
+    statusSolved: 'Solved',
+    difficulty: 'Difficulty',
+    reward: 'Reward',
+    solutions: 'Solutions',
+    votes: 'Net votes',
+    tags: 'Tags',
+    year: 'Year',
+    proposer: 'Proposer',
+    empty: 'No problems match your search'
+  },
+
+  problem: {
+    back: '← Back to problems',
+    info: 'Info',
+    kidExplain: 'Kid-friendly explanation',
+    formalStatement: 'Formal statement',
+    whyHard: 'Why it\'s hard',
+    howToEarn: 'How to earn points',
+    earnSubmit: 'Submit any solution: +{n} HPW',
+    earnAi: 'AI score ≥ {n}: +{m} HPW per point',
+    earnVote: 'Upvotes (each): +{n} HPW to author',
+    earnFullSolve: 'Full solve: up to {n} HPW',
+    earnRule: 'All points auto-stake in 5s. Permanent on-chain.',
+    aiSolver: 'AI assistant',
+    aiSolverDesc: 'Tell AI your angle. It will answer in 3 layers: popular → academic → research direction.',
+    aiUsingLLM: 'using real LLM',
+    aiFallback: 'heuristic fallback',
+    userInputPlaceholder: '(optional) e.g. explain with an example?',
+    runAi: 'Ask AI',
+    noSolution: 'No solution yet. Be the first!',
+    submitSolution: 'Submit solution',
+    submittedBy: 'by {user}',
+    quality: 'AI score',
+    selfTest: 'My solution'
+  },
+
+  submit: {
+    title: 'My solution',
+    contentPlaceholder: 'Write down your thoughts. At least 20 chars. Better structure = higher score.',
+    tooShort: 'Solution too short (min 20 chars)',
+    submitted: 'Submitted!',
+    submitFailed: 'Submit failed: {msg}'
+  },
+
+  leaderboard: {
+    title: 'Leaderboard',
+    subtitle: 'Sorted by on-chain HPW. New block every 5 seconds.',
+    solvers: 'Solvers',
+    solutions: 'Total solutions',
+    txOnChain: 'On-chain txs',
+    height: 'Chain height',
+    rewardsPaid: 'Rewards paid',
+    rank: 'Rank',
+    score: 'Score',
+    badges: 'Badges',
+    badgesTitle: '{n}-tier challenger badges'
+  },
+
+  chain: {
+    title: 'Blockchain explorer',
+    subtitle: 'Every point transaction is immutably on-chain. Click a block to view details.',
+    height: 'Height (blocks)',
+    totalTxs: 'Total txs',
+    totalSupply: 'Total supply (HPW)',
+    valid: 'Valid',
+    invalid: 'Invalid',
+    selectBlock: 'Click a block on the left to view transactions',
+    latestBlocks: 'Latest blocks',
+    latestTxs: 'Latest txs',
+    txId: 'Tx ID',
+    type: 'Type',
+    to: 'To',
+    amount: 'Amount',
+    time: 'Time',
+    empty: 'No data'
+  },
+
+  auth: {
+    title: 'Join the hard problems',
+    subtitle: 'Create an account and start solving',
+    username: 'Username',
+    usernameHint: '2-30 chars, alphanumeric, _, CJK, -',
+    password: 'Password',
+    passwordHint: '6-200 chars',
+    bio: 'Bio (optional)',
+    bioHint: 'max 200 chars',
+    register: 'Sign up',
+    login: 'Log in',
+    switchToLogin: 'Have an account? Log in',
+    switchToRegister: 'No account? Sign up',
+    welcome: '100 HPW welcome bonus',
+    errUsername: 'Username must be 2-30 chars',
+    errPassword: 'Password must be 6-200 chars',
+    errTaken: 'Username taken',
+    errWrong: 'Wrong username or password'
+  },
+
+  notFound: {
+    title: '404 — Page not found',
+    desc: 'The page you\'re looking for doesn\'t exist, or hasn\'t been indexed yet. How about checking out {n} hard problems?',
+    home: '← Home',
+    browse: 'Browse problems',
+    rank: 'Leaderboard'
+  },
+
+  pwa: {
+    install: 'Install HardProblems to your device for quick access',
+    installShort: 'Install',
+    update: 'New version ready',
+    updateNow: 'Update now',
+    offline: 'You\'re offline · some features unavailable'
+  },
+
+  categories: {
+    mathematics: 'Mathematics',
+    physics: 'Physics',
+    chemistry: 'Chemistry',
+    biology: 'Biology',
+    cs: 'Computer Science',
+    philosophy: 'Philosophy',
+    engineering: 'Engineering',
+    social: 'Social Sciences'
+  }
+};

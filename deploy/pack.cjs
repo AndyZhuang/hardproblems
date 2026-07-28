@@ -17,15 +17,19 @@ const excludes = [
   '*.log', '*.zip', '*.tar.gz', '*.tgz',
   'dist', '.cache', 'coverage', '.nyc_output',
   '.DS_Store', 'Thumbs.db', 'pack.cjs', 'screenshot*.cjs',
-  'e2e_test.cjs'
+  'e2e_test.cjs', 'e2e_test_v2.cjs', 'perf_audit.cjs',
+  // 大图：保留到 192，384/512 太大省略（生成时再生成）
+  'icon-512.png', 'icon-384.png'
 ];
 
 function shouldExclude(p) {
   const rel = p.replace(ROOT + path.sep, '').replace(/\\/g, '/');
+  const base = path.basename(p);
   for (const ex of excludes) {
     if (rel === ex) return true;
     if (rel.startsWith(ex + '/')) return true;
     if (rel.includes('/' + ex + '/')) return true;
+    if (base === ex) return true;  // 任意目录下的同名文件
   }
   return false;
 }

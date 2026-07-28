@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { useI18n, t } from '../lib/i18n.js';
 
 export default function Chain() {
-  useDocumentTitle('区块链浏览器', 'HardProblems 链上区块与交易实时浏览');
+  const { lang } = useI18n();
+  useDocumentTitle(
+    lang === 'zh-CN' ? '区块链浏览器' : 'Blockchain Explorer',
+    lang === 'zh-CN' ? 'HardProblems 链上区块与交易实时浏览' : 'Real-time on-chain blocks and transactions'
+  );
   const [info, setInfo] = useState(null);
   const [blocks, setBlocks] = useState([]);
   const [txs, setTxs] = useState([]);
@@ -38,13 +43,13 @@ export default function Chain() {
     setSelectedBlock(r);
   };
 
-  if (loading) return <div className="container-page py-20 text-center text-slate-400">加载中...</div>;
+  if (loading) return <div className="container-page py-20 text-center text-slate-400">{t('common.loading')}</div>;
 
   return (
     <div className="container-page py-8">
       <div className="mb-6">
-        <h1 className="text-3xl sm:text-4xl font-display font-bold">⛓ 区块链浏览器</h1>
-        <p className="text-slate-400 mt-2 text-sm">每笔积分交易都不可篡改地上链。点击区块查看详情。</p>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold">⛓ {t('chain.title')}</h1>
+        <p className="text-slate-400 mt-2 text-sm">{t('chain.subtitle')}</p>
       </div>
 
       {info && (

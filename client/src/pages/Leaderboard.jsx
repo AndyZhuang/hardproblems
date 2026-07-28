@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { useI18n, t } from '../lib/i18n.js';
 
 export default function Leaderboard() {
-  useDocumentTitle('排行榜', '看看谁在解决硬问题，按学科筛选');
+  const { lang } = useI18n();
+  useDocumentTitle(
+    lang === 'zh-CN' ? '排行榜' : 'Leaderboard',
+    lang === 'zh-CN' ? '看看谁在解决硬问题，按学科筛选' : 'See who\'s solving hard problems, filter by category'
+  );
   const [lb, setLb] = useState([]);
   const [stats, setStats] = useState(null);
   const [category, setCategory] = useState('all');
@@ -18,18 +23,18 @@ export default function Leaderboard() {
   return (
     <div className="container-page py-8">
       <div className="mb-6">
-        <h1 className="text-3xl sm:text-4xl font-display font-bold">🏆 排行榜</h1>
-        <p className="text-slate-400 mt-2 text-sm">按链上 HPW 积分排序。每 5 秒自动结算到新区块。</p>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold">🏆 {t('leaderboard.title')}</h1>
+        <p className="text-slate-400 mt-2 text-sm">{t('leaderboard.subtitle')}</p>
       </div>
 
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {[
-            { l: '解题者', v: stats.users, c: 'text-violet-300' },
-            { l: '解答总数', v: stats.solutions, c: 'text-fuchsia-300' },
-            { l: '链上交易', v: stats.transactions, c: 'text-cyan-300' },
-            { l: '链高度', v: stats.blocks, c: 'text-emerald-300' },
-            { l: '已发奖励', v: stats.totalReward, c: 'text-amber-300' }
+            { l: t('leaderboard.solvers'), v: stats.users, c: 'text-violet-300' },
+            { l: t('leaderboard.solutions'), v: stats.solutions, c: 'text-fuchsia-300' },
+            { l: t('leaderboard.txOnChain'), v: stats.transactions, c: 'text-cyan-300' },
+            { l: t('leaderboard.height'), v: stats.blocks, c: 'text-emerald-300' },
+            { l: t('leaderboard.rewardsPaid'), v: stats.totalReward, c: 'text-amber-300' }
           ].map(s => (
             <div key={s.l} className="card text-center">
               <div className={`text-2xl font-display font-bold ${s.c}`}>{s.v}</div>
@@ -40,19 +45,19 @@ export default function Leaderboard() {
       )}
 
       <div className="flex flex-wrap gap-1.5 mb-4">
-        <CategoryTab id="all" name="全部" current={category} onClick={setCategory} />
+        <CategoryTab id="all" name={t('common.all')} current={category} onClick={setCategory} />
         {stats?.categories?.map(c => (
-          <CategoryTab key={c.id} id={c.id} name={`${c.name} (${c.solved}/${c.count})`} current={category} onClick={setCategory} />
+          <CategoryTab key={c.id} id={c.id} name={`${t('categories.' + c.id) || c.name} (${c.solved}/${c.count})`} current={category} onClick={setCategory} />
         ))}
       </div>
 
       <div className="card overflow-hidden p-0">
         {loading ? (
-          <div className="p-8 text-center text-slate-400">加载中...</div>
+          <div className="p-8 text-center text-slate-400">{t('common.loading')}</div>
         ) : lb.length === 0 ? (
           <div className="p-12 text-center text-slate-500">
             <div className="text-4xl mb-2">🏁</div>
-            还没有人来答题。
+            {lang === 'zh-CN' ? '还没有人来答题。' : 'No one has submitted yet.'}
           </div>
         ) : (
           <div className="divide-y divide-white/5">

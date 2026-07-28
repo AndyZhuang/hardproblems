@@ -5,6 +5,70 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-07-29
+
+### Added - PWA & i18n
+
+**PWA (Progressive Web App)**
+- `manifest.webmanifest` with 8 icon sizes (72/96/128/144/152/192/384/512) + shortcuts
+- Service Worker (`/sw.js`) with strategy:
+  - HTML navigations: Network First, fallback to `/offline.html`
+  - Static assets (`/assets/`, `/icons/`): Cache First
+  - API: Network Only (never cache on-chain data)
+- Custom offline page with brand styling
+- `usePWA()` hook: install prompt, online/offline, SW update detection
+- `PWABanner` component: install prompt + update prompt + offline indicator
+- Apple touch icon + mobile-web-app-capable + theme-color
+- PWA icon generated via `image_synthesize` (brain + atom + blockchain block design)
+
+**i18n (Internationalization)**
+- Self-implemented i18n (no external dependency)
+- 2 languages: `zh-CN` (Simplified Chinese, default) + `en-US` (English)
+- Auto-detection from `navigator.language`
+- LocalStorage persistence (`hpw.lang` key)
+- `LangSwitcher` component (dropdown in header)
+- 100+ translation keys covering: nav, home, problems, problem detail, submit, leaderboard, chain, auth, notFound, pwa, categories
+- Formatted strings with placeholders (`{n}`, `{name}`)
+- Fallback to key when translation missing
+
+**Mobile responsive**
+- Header collapses to hamburger menu on small screens
+- Stats grid: 4 cols → 2 cols on mobile
+- All forms, buttons, cards adapt
+- Tested on 390x844 (iPhone 12 Pro) viewport
+
+### Performance & Quality
+
+- Production build: **265KB JS** (gzip 103KB) + **32KB CSS** (gzip 6KB) + 18 resources
+- FCP: **1.1s** on cold load (excluding blocked Google Fonts CDN)
+- DOMContentLoaded: **707ms**
+- API responses: **< 20ms** (after V8 warmup)
+- 18 PWA precached resources
+- 89 files in source ZIP, 300KB packed
+
+### Testing
+- `e2e_test_v2.cjs`: 38 assertions across 11 test sections
+  - Health check, data integrity (64 problems, 8 categories, 7 badges)
+  - Register/login flow with wallet generation
+  - Solution submission with AI evaluation
+  - Voting system
+  - Leaderboard with badges
+  - Chain validation
+  - UI rendering on 5 pages (no React errors)
+  - PWA checks (SW, manifest, theme-color, viewport)
+  - i18n switch (zh ↔ en)
+  - Mobile responsive
+- `perf_audit.cjs`: 15 checks (performance, security, SEO, a11y)
+  - All security headers (helmet, X-Powered-By hidden)
+  - gzip compression (verified on /api/problems)
+  - SEO meta (title, description, og, twitter)
+  - Accessibility (html lang, button labels, img alts)
+
+### Fixed
+- React error #31 (Objects as React child): refactored step arrays to use unique key names (`n`, `title`, `desc` instead of `i`, `t`, `d` which conflicted with i18n import shadowing)
+- PWA banner mobile: removed duplicate "Install" text
+- Description meta length: expanded to 80 chars for better SEO
+
 ## [1.0.0] - 2026-07-29
 
 ### 🎉 First Production Release

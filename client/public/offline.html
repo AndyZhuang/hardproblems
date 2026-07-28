@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>离线 · HardProblems.World</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background-image: radial-gradient(circle at 1px 1px, rgba(99,102,241,0.15) 1px, transparent 0);
+      background-size: 32px 32px;
+    }
+    .card {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid #1e293b;
+      border-radius: 24px;
+      padding: 48px 32px;
+    }
+    .icon { font-size: 64px; margin-bottom: 16px; }
+    h1 { font-size: 24px; margin-bottom: 8px; color: #fff; }
+    p { color: #94a3b8; line-height: 1.6; margin-bottom: 24px; }
+    .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    button, a {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 500;
+      transition: transform 0.1s;
+    }
+    button:active, a:active { transform: scale(0.98); }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📡</div>
+    <h1>网络好像断开了</h1>
+    <p>你现在处于离线状态。HardProblems.World 的大部分页面仍然可以访问，等你重新联网后，区块链和 AI 助手会自动恢复。</p>
+    <div class="actions">
+      <button class="btn-primary" onclick="location.reload()">重新尝试</button>
+      <a href="/" class="btn-secondary">回到首页</a>
+    </div>
+  </div>
+</body>
+</html>

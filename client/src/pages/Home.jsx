@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import ProblemCard from '../components/ProblemCard.jsx';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { useI18n, t } from '../lib/i18n.js';
 
 export default function Home() {
-  useDocumentTitle(null, '用 AI 解决 8 大学科 64 个世界级硬问题，链上积分奖励。');
+  const { lang } = useI18n();
+  useDocumentTitle(null, lang === 'zh-CN'
+    ? '用 AI 解决 8 大学科 64 个世界级硬问题，链上积分奖励。'
+    : 'Solve 64 world-class hard problems across 8 disciplines with AI, on-chain rewards.'
+  );
   const [cats, setCats] = useState([]);
   const [problems, setProblems] = useState([]);
   const [stats, setStats] = useState(null);
@@ -18,6 +23,9 @@ export default function Home() {
     api.leaderboard({ limit: 5 }).then(r => setTop(r?.leaderboard || [])).catch(() => setTop([]));
   }, []);
 
+  const problemCount = stats?.problems || 64;
+  const isZh = lang === 'zh-CN';
+
   return (
     <div>
       {/* Hero */}
@@ -25,26 +33,39 @@ export default function Home() {
         <div className="container-page text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-slate-400 mb-6">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>链上 {stats?.transactions || 0} 笔交易 · {stats?.users || 0} 位解题者</span>
+            <span>
+              {isZh
+                ? <>链上 <b className="text-emerald-300">{stats?.transactions || 0}</b> 笔交易 · <b className="text-emerald-300">{stats?.users || 0}</b> 位解题者</>
+                : <><b className="text-emerald-300">{stats?.transactions || 0}</b> on-chain txs · <b className="text-emerald-300">{stats?.users || 0}</b> solvers</>
+              }
+            </span>
           </div>
           <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
-            用 <span className="gradient-text">AI</span> 解决<br className="sm:hidden" />世界上最难的
-            <span className="gradient-text"> {stats?.problems || 64}</span> 个问题
+            {isZh ? (
+              <>用 <span className="gradient-text">AI</span> 解决<br className="sm:hidden" />世界上最难的<span className="gradient-text"> {problemCount}</span> 个问题</>
+            ) : (
+              <>Solve the <span className="gradient-text">{problemCount}</span><br className="sm:hidden" /> hardest problems with <span className="gradient-text">AI</span></>
+            )}
           </h1>
           <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            从黎曼猜想到室温超导，从意识本质到核聚变。<br className="hidden sm:block" />
-            每个小朋友都能用 AI 尝试解决，每个解答都获得<strong className="text-amber-300">链上 HPW 积分奖励</strong>。
+            {isZh ? (
+              <>从黎曼猜想到室温超导，从意识本质到核聚变。<br className="hidden sm:block" />
+              每个小朋友都能用 AI 尝试解决，每个解答都获得<strong className="text-amber-300">链上 HPW 积分奖励</strong>。</>
+            ) : (
+              <>From Riemann to room-temperature superconductors, from consciousness to fusion.<br className="hidden sm:block" />
+              Anyone can use AI to try. Every solution earns <strong className="text-amber-300">on-chain HPW points</strong>.</>
+            )}
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
-            <Link to="/problems" className="btn-primary px-6 py-3 text-base">开始解题 →</Link>
-            <Link to="/leaderboard" className="btn-ghost px-6 py-3 text-base">查看排行榜</Link>
+            <Link to="/problems" className="btn-primary px-6 py-3 text-base">{t('home.cta')}</Link>
+            <Link to="/leaderboard" className="btn-ghost px-6 py-3 text-base">{t('home.ctaLeaderboard')}</Link>
           </div>
           <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
             {[
-              { k: stats?.problems || 64, l: '硬问题' },
-              { k: stats?.solutions || 0, l: '已提交解答' },
-              { k: stats?.users || 0, l: '解题者' },
-              { k: stats?.totalReward || 0, l: 'HPW 已发放' }
+              { k: problemCount, l: t('home.statsProblems') },
+              { k: stats?.solutions || 0, l: t('home.statsSolved') },
+              { k: stats?.users || 0, l: t('home.statsUsers') },
+              { k: stats?.totalReward || 0, l: t('home.statsRewards') }
             ].map(s => (
               <div key={s.l} className="glass rounded-2xl p-4 text-center">
                 <div className="text-2xl sm:text-3xl font-display font-bold gradient-text">{s.k}</div>
@@ -60,10 +81,10 @@ export default function Home() {
         <div className="container-page">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-display font-bold">8 大领域</h2>
-              <p className="text-sm text-slate-400 mt-1">点击进入任一领域，看看人类还没解决的问题</p>
+              <h2 className="text-2xl sm:text-3xl font-display font-bold">{t('home.categories', { n: 8 })}</h2>
+              <p className="text-sm text-slate-400 mt-1">{t('home.categoriesDesc')}</p>
             </div>
-            <Link to="/problems" className="text-sm text-violet-400 hover:text-violet-300">全部问题 →</Link>
+            <Link to="/problems" className="text-sm text-violet-400 hover:text-violet-300">{t('home.viewAll')}</Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {cats.map(c => (
@@ -86,10 +107,10 @@ export default function Home() {
         <div className="container-page">
           <div className="flex items-end justify-between mb-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-display font-bold">🔥 高分悬赏</h2>
-              <p className="text-sm text-slate-400 mt-1">挑战这些大难题，最高可获数千 HPW 奖励</p>
+              <h2 className="text-2xl sm:text-3xl font-display font-bold">{isZh ? '🔥 高分悬赏' : '🔥 High rewards'}</h2>
+              <p className="text-sm text-slate-400 mt-1">{isZh ? '挑战这些大难题，最高可获数千 HPW 奖励' : 'Take on these — earn thousands of HPW'}</p>
             </div>
-            <Link to="/problems?sort=reward" className="text-sm text-violet-400 hover:text-violet-300">查看全部 →</Link>
+            <Link to="/problems?sort=reward" className="text-sm text-violet-400 hover:text-violet-300">{t('common.more')} →</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {problems.sort((a,b) => b.reward - a.reward).slice(0, 6).map(p => (
@@ -102,19 +123,28 @@ export default function Home() {
       {/* How it works */}
       <section className="py-12">
         <div className="container-page">
-          <h2 className="text-2xl sm:text-3xl font-display font-bold text-center mb-10">怎么玩？3 步开始</h2>
+          <h2 className="text-2xl sm:text-3xl font-display font-bold text-center mb-10">{isZh ? '怎么玩？3 步开始' : 'How it works · 3 steps'}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              { i: '1', t: '选一个问题', d: '从数学、物理到哲学、社会，挑一个你觉得有趣的' },
-              { i: '2', t: '用 AI 解题', d: '一键调用 AI 给出思路，再结合你的理解撰写解答' },
-              { i: '3', t: '获得 HPW', d: '提交解答后 AI 自动评估，奖励自动上链，进入排行榜' }
-            ].map(s => (
-              <div key={s.i} className="card text-center">
-                <div className="w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-xl font-bold">{s.i}</div>
-                <h3 className="mt-3 font-display font-bold text-lg">{s.t}</h3>
-                <p className="text-sm text-slate-400 mt-2">{s.d}</p>
-              </div>
-            ))}
+            {(() => {
+              const STEPS = isZh
+                ? [
+                    { n: '1', title: '选一个问题', desc: '从数学、物理到哲学、社会，挑一个你觉得有趣的' },
+                    { n: '2', title: '用 AI 解题', desc: '一键调用 AI 给出思路，再结合你的理解撰写解答' },
+                    { n: '3', title: '获得 HPW', desc: '提交解答后 AI 自动评估，奖励自动上链，进入排行榜' }
+                  ]
+                : [
+                    { n: '1', title: 'Pick a problem', desc: 'Math, physics, philosophy, social — pick what excites you' },
+                    { n: '2', title: 'Use AI to solve', desc: 'Get AI\'s angle, combine with your understanding, write it up' },
+                    { n: '3', title: 'Earn HPW', desc: 'AI scores your solution, rewards auto-stake, you climb the leaderboard' }
+                  ];
+              return STEPS.map(s => (
+                <div key={s.n} className="card text-center">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-xl font-bold">{s.n}</div>
+                  <h3 className="mt-3 font-display font-bold text-lg">{s.title}</h3>
+                  <p className="text-sm text-slate-400 mt-2">{s.desc}</p>
+                </div>
+              ));
+            })()}
           </div>
         </div>
       </section>
@@ -124,8 +154,8 @@ export default function Home() {
         <section className="py-8">
           <div className="container-page">
             <div className="flex items-end justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-display font-bold">🏆 当前榜首</h2>
-              <Link to="/leaderboard" className="text-sm text-violet-400 hover:text-violet-300">完整榜单 →</Link>
+              <h2 className="text-2xl sm:text-3xl font-display font-bold">🏆 {isZh ? '当前榜首' : 'Top solvers'}</h2>
+              <Link to="/leaderboard" className="text-sm text-violet-400 hover:text-violet-300">{isZh ? '完整榜单' : 'Full leaderboard'} →</Link>
             </div>
             <div className="card divide-y divide-white/5">
               {top.map((u, i) => (
@@ -135,7 +165,7 @@ export default function Home() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{u.username}</div>
-                    <div className="text-xs text-slate-500">{u.solutionCount} 解答 · {u.netVotes} 净投票</div>
+                    <div className="text-xs text-slate-500">{u.solutionCount} {isZh ? '解答' : 'sols'} · {u.netVotes} {isZh ? '净投票' : 'net votes'}</div>
                   </div>
                   <div className="font-mono text-amber-300">⚡ {u.totalScore}</div>
                 </Link>
