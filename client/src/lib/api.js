@@ -437,6 +437,9 @@ const localImpl = {
   async transactions({ limit = 30, address } = {}) {
     return { transactions: await clientChain.getTransactions(limit, address) };
   },
+  async transaction(id) {
+    return { transaction: await clientChain.getTransaction(id) };
+  },
   async balance(address) {
     return { address, balance: await clientChain.getBalance(address), user: null };
   },
@@ -582,11 +585,50 @@ function localRoute(path, opts = {}) {
     for (const [k, v] of sp) query[k] = v;
   }
 
-  // 简单的路由器
+  // 显式路由表（覆盖模糊匹配）
+  const EXPLICIT_ROUTES = {
+    '/problems/categories': 'categories',
+    '/users/register': 'registerUser',
+    '/users/login': 'loginUser',
+    '/users/me': 'me',
+    '/users/logout': 'logout',
+    '/leaderboard/stats': 'stats',
+    '/chain/info': 'chainInfo',
+    '/chain/validate': 'validate',
+    '/chain/blocks': 'blocks',
+    '/chain/transactions': 'transactions',
+    '/ai/solve': 'solve',
+    '/ai/evaluate': 'evaluate',
+    '/health': 'health'
+  };
+  if (EXPLICIT_ROUTES[cleanPath]) {
+    return localApi[EXPLICIT_ROUTES[cleanPath]]();
+  }
+
+  // 3 段路径：/chain/blocks/:id, /chain/transactions/:id, /chain/balance/:address, /chain/address/:address
+  const m3 = cleanPath.match(/^\/(\w+)\/(\w+)\/(\w+)$/);
+  if (m3) {
+    const [, r1, r2, r3] = m3;
+    if (r1 === 'chain' && r2 === 'blocks') return localImpl.block(r3);
+    if (r1 === 'chain' && r2 === 'transactions') return localImpl.transaction(r3);
+    if (r1 === 'chain' && r2 === 'balance') return localImpl.balance(r3);
+    if (r1 === 'chain' && r2 === 'address') return localImpl.address(r3, params || {});
+  }
+
+  // 4 段：/solutions/:id/vote, /solutions/:id/my-vote
+  const m4 = cleanPath.match(/^\/(\w+)\/(\w+)\/(\w+)$/);
+  if (m4 && m4[1] === 'solutions') {
+    const sid = m4[2];
+    const action = m4[3];
+    if (action === 'vote') return localImpl.vote(sid, body && body.value);
+    if (action === 'my-vote') return localImpl.myVote(sid);
+  }
+
+  // 简单路由器
   const m = cleanPath.match(/^\/(\w+)(?:\/(\w+))?$/);
   if (!m) throw new Error('Local route not found: ' + path);
   let resource = m[1];
-  const id = m[2];
+  let id = m[2];
   // 关键：/problems/:id 应该走 problem (单数)，不是 problems (列表)
   if (resource === 'problems' && id) resource = 'problem';
   const method = opts.method || 'GET';
@@ -616,6 +658,9 @@ function localRoute(path, opts = {}) {
     solve: () => localImpl.solve(body),
     evaluate: () => localImpl.evaluate(body),
     me: () => localImpl.me(),
+    registerUser: () => localImpl.register(body),
+    loginUser: () => localImpl.login(body),
+    logout: () => { setToken(null); return { ok: true }; },
     users: () => {
       if (method === 'POST' && !id) {
         if (body && body.username && body.password) {

@@ -73,3 +73,13 @@ docker-compose*.yml
 .cache/
 .parcel-cache/
 .eslintcache
+
+# ===== 临时调试脚本 =====
+debug_*.cjs
+debug_*.js
+e2e_test*.cjs
+screenshot_*.cjs
+perf_audit.cjs
+pack.cjs
+test_*.cjs
+test_*.js
