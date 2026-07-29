@@ -10,14 +10,16 @@ const RELEASES = path.join(ROOT, 'releases');
 if (!fs.existsSync(RELEASES)) fs.mkdirSync(RELEASES, { recursive: true });
 
 const ts = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
-const outZip = path.join(RELEASES, `hardproblems-v1.0.0-source-${ts}.zip`);
+const VERSION = process.env.VERSION || '1.2.0';
+const outZip = path.join(RELEASES, `hardproblems-v${VERSION}-source-${ts}.zip`);
 
 const excludes = [
   'node_modules', 'data', 'screenshots', '.git', 'releases',
   '*.log', '*.zip', '*.tar.gz', '*.tgz',
   'dist', '.cache', 'coverage', '.nyc_output',
   '.DS_Store', 'Thumbs.db', 'pack.cjs', 'screenshot*.cjs',
-  'e2e_test.cjs', 'e2e_test_v2.cjs', 'perf_audit.cjs',
+  'e2e_test.cjs', 'e2e_test_v2.cjs', 'e2e_v*.cjs', 'perf_audit.cjs', 'verify_mcode.cjs',
+  'check_*.js', 'debug_*.cjs',
   // 大图：保留到 192，384/512 太大省略（生成时再生成）
   'icon-512.png', 'icon-384.png'
 ];

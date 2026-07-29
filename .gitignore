@@ -17,6 +17,9 @@ build/
 data/
 data/*.json
 !data/.gitkeep
+# 例外：server 端的源码 data/ 目录（含 problems.js 静态源数据）
+!server/src/data/
+!server/src/data/problems.js
 logs/
 *.log
 npm-debug.log*
