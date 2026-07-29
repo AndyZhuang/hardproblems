@@ -78,8 +78,14 @@ docker-compose*.yml
 debug_*.cjs
 debug_*.js
 e2e_test*.cjs
+e2e_v*.cjs
 screenshot_*.cjs
 perf_audit.cjs
 pack.cjs
 test_*.cjs
 test_*.js
+check_*.js
+
+# ===== Python =====
+deploy/__pycache__/
+*.pyc

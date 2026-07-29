@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import ProblemCard from '../components/ProblemCard.jsx';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { PROBLEMS } from '../lib/problems.js';
 
 const STATUS_OPTS = [
   { v: '', l: '全部' },
@@ -12,7 +13,7 @@ const STATUS_OPTS = [
 ];
 
 export default function Problems() {
-  useDocumentTitle('硬问题列表', '8 大学科 64 个世界级硬问题，按学科、状态、关键词筛选。');
+  useDocumentTitle('硬问题列表', `8 大学科 ${PROBLEMS.length} 个世界级硬问题，按学科、状态、关键词筛选。`);
   const [sp, setSp] = useSearchParams();
   const [cats, setCats] = useState([]);
   const [problems, setProblems] = useState([]);

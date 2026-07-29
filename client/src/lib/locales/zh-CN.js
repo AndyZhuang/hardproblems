@@ -37,6 +37,7 @@ export default {
   nav: {
     home: '首页',
     problems: '硬问题',
+    contribute: '提交问题',
     leaderboard: '排行榜',
     chain: '区块链',
     login: '登录',

@@ -35,6 +35,7 @@ export default {
   nav: {
     home: 'Home',
     problems: 'Problems',
+    contribute: 'Contribute',
     leaderboard: 'Leaderboard',
     chain: 'Chain',
     login: 'Log in',

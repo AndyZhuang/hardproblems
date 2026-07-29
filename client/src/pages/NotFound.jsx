@@ -1,15 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n, t } from '../lib/i18n.js';
-import { api } from '../lib/api.js';
-import { useEffect, useState } from 'react';
+import { PROBLEMS } from '../lib/problems.js';
 
 export default function NotFound() {
   const { lang } = useI18n();
-  const [count, setCount] = useState(64);
-  useEffect(() => {
-    api.stats().then(s => setCount(s?.problems || 64)).catch(() => {});
-  }, []);
+  const count = PROBLEMS.length;
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6">
       <div className="text-7xl mb-4">🧭</div>

@@ -5,6 +5,103 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-30
+
+### 🎉 HardProblems 三大升级: 200+ 题库 + 视频介绍 + 用户贡献
+
+**从 64 题扩展到 203 题；每个问题增加视频介绍和参与方式；新增用户提交问题流程。**
+
+### Added - 内容升级 (200+)
+
+**问题数量 64 → 203** (`server/src/data/problems.js`, `client/src/lib/problems.js`)
+- 数学 10 → 27 (新增 abc/beal/fermat-catalan/Erdős-Straus/odd-perfect/Mertens/Cramér 等)
+- 物理 10 → 24 (新增 hierarchy/strong-CP/measurement/cosmological-constant/arrow-of-time/vacuum-decay/neutrino-mass 等)
+- 化学 5 → 26 (新增 perovskite/Li-air/biocatalyst/self-healing/MOF/green-chem 等)
+- 生命科学 8 → 25 (新增 microbiome/gene-drive/microbiome/epigenetics/universal-flu/HIV-cure 等)
+- 计算机 7 → 25 (新增 crypto-scale/consensus/privacy-ml/AI-code/AI-math/self-improve-ai 等)
+- 哲学 6 → 25 (新增 personal-identity/epistemology/truth/beauty/time/punishment/trolley 等)
+- 工程 11 → 26 (新增 nuclear-waste/asteroid-mining/floating-city/earthquake-pred/self-healing-infra 等)
+- 社会 7 → 25 (新增 UBI/digital-democracy/AI-governance/remote-work/climate-migration 等)
+- 数据生成器: `deploy/gen_problems.py` (可重跑生成)
+
+**每个问题新增字段**:
+- `videoUrl`: YouTube embed URL
+- `videoTitle` / `videoChannel`: 视频元数据
+- `participate`: 数组 `{type, label, desc}` — 用户能用什么方式参与
+
+**参与方式字典** (18 种):
+- solve, code, experiment, data, survey, discuss, prototype, community, citizen-science, kid-project, visualize, model, analyze, essay, team, translate, teach, fund
+- 每种有独立 icon / color / 背景 / 描述
+
+### Added - 用户提交问题 (Contribute)
+
+**新页面 `/contribute`**
+- 4 步流程：粗略输入 → AI 扩展 → 审核编辑 → 提交待审核
+- 启发式 fallback (浏览器模式无 LLM 时也能生成结构化问题)
+- 本地 localStorage 保存待提交列表 (刷新不丢)
+- 一键复制 JSON 提交到管理员
+
+**新 API 端点**: `POST /ai/contribute` (server-side, 用 LLM 扩展 + fallback)
+- 已加在 `client/src/lib/api.js` 的 dual-mode (浏览器/服务器都支持)
+
+### UI 升级
+
+**ProblemDetail** (`client/src/pages/ProblemDetail.jsx`)
+- 顶部 YouTube 视频 iframe 嵌入 (16:9 自适应)
+- "我能怎么参与？" 卡片网格 (按 participate 渲染)
+- 侧边栏新增 "推荐一个类似问题" → 引导到 Contribute
+
+**Contribute** (`client/src/pages/Contribute.jsx`) - 新文件
+- 4 步进度条
+- 学科选择 + 附加要求 textarea
+- AI 扩展按钮 (loading 状态)
+- 完整审核表单 (title/titleEn/summary/kid/formal/whyHard/aiPrompt/tags/videoUrl/participate)
+- 参与方式 18 项 chip 选择 (最多 6)
+- 提交后保存到 localStorage, 列出 + 编辑/复制/删除
+
+**导航** (`client/src/components/Layout.jsx`)
+- 新增 "提交问题" 链接 (zh-CN) / "Contribute" (en-US)
+
+### Bug Fixes
+
+- **路由正则 bug**: `\w` 不包含 `-` 导致 `/problems/beal-conjecture` 被截成 `/problems/beal` —— 改成 `[\w-]+`
+- **首页/NotFound 硬编码 64**: 改成 `PROBLEMS.length` 动态读取
+
+### i18n
+
+- 导航栏新增 `nav.contribute` (zh-CN: 提交问题 / en-US: Contribute)
+- Contribute 页面预留 i18n (下一步)
+
+### Generator Scripts
+
+- `deploy/gen_problems.py` — Python 源数据 (200+ 问题 + 18 种参与方式)
+- `deploy/gen_problems_js.py` — 把 Python 数据转成 JS
+
+### Testing
+
+- `e2e_v1.2.cjs`: 12/12 通过
+  - Home: 203 problems displayed ✅
+  - Problems list: 203 cards ✅
+  - Problem detail: 黎曼猜想 ✅ + video + participate ✅
+  - Contribute: 流程跑通 + AI 生成 ✅
+  - i18n: 中/英 切换 ✅
+  - Chain / Leaderboard: 正常 ✅
+
+### Files Changed
+
+- `client/src/App.jsx` — 新增 /contribute 路由
+- `client/src/components/Layout.jsx` — 新增提交问题 nav
+- `client/src/lib/api.js` — 修复路由正则, 新增 contributeProblem + contribute 本地方法
+- `client/src/lib/problems.js` — 203 problems (新生成)
+- `client/src/lib/locales/{zh-CN,en-US}.js` — 新增 nav.contribute
+- `client/src/pages/Home.jsx`, `Problems.jsx`, `NotFound.jsx` — 用 PROBLEMS.length 替代硬编码
+- `client/src/pages/ProblemDetail.jsx` — 新增视频 + 参与 + 提交入口
+- `client/src/pages/Contribute.jsx` — 新文件
+- `client/index.html` — title/description 改 203
+- `server/src/data/problems.js` — 同步 203 problems
+- `server/src/routes/ai.js` — 新增 /ai/contribute
+- `deploy/gen_problems.py`, `deploy/gen_problems_js.py` — 新生成器
+
 ## [1.1.0] - 2026-07-29
 
 ### Added - PWA & i18n

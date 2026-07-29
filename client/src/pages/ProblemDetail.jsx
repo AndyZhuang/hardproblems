@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { PARTICIPATE_TYPES } from '../lib/problems.js';
+import { t } from '../lib/i18n.js';
 
 const DIFFICULTY_LABEL = ['', '入门', '简单', '中等', '困难', '极难'];
 const STATUS_LABEL = { open: '未解', partially_solved: '部分', solved: '已解' };
@@ -119,6 +121,55 @@ export default function ProblemDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 左侧主内容 */}
         <div className="lg:col-span-2 space-y-6">
+          {/* 视频介绍 */}
+          {problem.videoUrl && problem.videoUrl !== '' && (
+            <div className="card overflow-hidden p-0">
+              <div className="aspect-video w-full bg-black/50">
+                <iframe
+                  src={problem.videoUrl}
+                  title={problem.videoTitle || problem.title}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+              {(problem.videoTitle || problem.videoChannel) && (
+                <div className="px-4 py-2 text-xs text-slate-500 border-t border-white/5 flex items-center gap-2">
+                  <span>🎬</span>
+                  {problem.videoTitle && <span className="text-slate-300">{problem.videoTitle}</span>}
+                  {problem.videoChannel && <span className="ml-auto">{problem.videoChannel}</span>}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 怎么参与解决 */}
+          {problem.participate && problem.participate.length > 0 && (
+            <div className="card bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 border-emerald-500/20">
+              <h2 className="text-lg font-display font-bold text-emerald-200 mb-3">🙋 我能怎么参与？</h2>
+              <p className="text-sm text-slate-400 mb-4">不需要你是专家。以下任何方式都能帮到这道问题：</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {problem.participate.map((p, idx) => {
+                  const meta = PARTICIPATE_TYPES[p.type] || { icon: '✨', color: 'text-slate-300', bg: 'bg-white/5', label: p.label, desc: p.desc };
+                  return (
+                    <div key={idx} className={`${meta.bg} border border-white/5 rounded-lg p-3`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{meta.icon}</span>
+                        <span className={`font-medium text-sm ${meta.color}`}>{p.label || meta.label}</span>
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed">{p.desc || meta.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-3 text-xs text-slate-500">
+                💡 不确定怎么做？直接 <button onClick={handleAiSolve} className="text-violet-400 hover:text-violet-300 underline">问 AI</button>，或在 <Link to="/leaderboard" className="text-violet-400 hover:text-violet-300 underline">排行榜</Link> 找合作者。
+              </div>
+            </div>
+          )}
+
           {/* 小朋友版 */}
           <div className="card bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-amber-500/20">
             <div className="flex items-start gap-3">
@@ -270,6 +321,18 @@ export default function ProblemDetail() {
               <li>· 解开难题：<b className="text-amber-300">最高 {problem.reward + 50} HPW</b></li>
             </ul>
             <p className="text-xs text-slate-500 mt-2">所有积分 5 秒内自动上链，永久可查。</p>
+          </div>
+
+          {/* 推荐类似问题给社区 */}
+          <div className="card bg-gradient-to-br from-violet-500/10 to-fuchsia-500/5 border-violet-500/20">
+            <h3 className="text-sm font-bold text-violet-200 mb-2">🌟 你想推荐一个类似问题？</h3>
+            <p className="text-xs text-slate-400 mb-3 leading-relaxed">
+              如果你知道一个相关的硬问题（无论是这个问题的变种、姊妹问题，还是完全不同的挑战），
+              可以用 AI 一键扩展 + 审核 + 提交到网站。
+            </p>
+            <Link to={`/contribute?category=${problem.category}`} className="block text-center py-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-200 text-xs font-medium transition-colors">
+              ✍️ 提交一个新问题 →
+            </Link>
           </div>
         </div>
       </div>

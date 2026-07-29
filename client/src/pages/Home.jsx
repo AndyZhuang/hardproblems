@@ -4,12 +4,14 @@ import { api } from '../lib/api.js';
 import ProblemCard from '../components/ProblemCard.jsx';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
 import { useI18n, t } from '../lib/i18n.js';
+import { PROBLEMS } from '../lib/problems.js';
 
 export default function Home() {
   const { lang } = useI18n();
+  const problemCount = PROBLEMS.length;
   useDocumentTitle(null, lang === 'zh-CN'
-    ? '用 AI 解决 8 大学科 64 个世界级硬问题，链上积分奖励。'
-    : 'Solve 64 world-class hard problems across 8 disciplines with AI, on-chain rewards.'
+    ? `用 AI 解决 8 大学科 ${problemCount} 个世界级硬问题，链上积分奖励。`
+    : `Solve ${problemCount} world-class hard problems across 8 disciplines with AI, on-chain rewards.`
   );
   const [cats, setCats] = useState([]);
   const [problems, setProblems] = useState([]);
@@ -23,7 +25,6 @@ export default function Home() {
     api.leaderboard({ limit: 5 }).then(r => setTop(r?.leaderboard || [])).catch(() => setTop([]));
   }, []);
 
-  const problemCount = stats?.problems || 64;
   const isZh = lang === 'zh-CN';
 
   return (
