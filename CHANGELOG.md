@@ -5,6 +5,79 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-07-30
+
+### 🐛 Critical Fix + 内容强化
+
+**v1.2.0 注册时偶发 "Cannot access 'y' before initialization" 错误的根因修复 + formal 字段全面强化。**
+
+### Fixed - TDZ 错误（v1.2.0 遗留）
+
+**问题**：`/users/register` 等显式路由在打包后偶发抛出 "Cannot access 'X' before initialization"
+（X 是 minifier 压缩后的单字母变量名，可能是 y/m/z/z 等）。
+
+**根因**：`client/src/lib/api.js` 的 `localRoute()` 函数中，`const localApi = {...}` 
+虽然源码在 `EXPLICIT_ROUTES` 检查之前声明，但 Vite 的 esbuild minifier 看到 
+`let resource, _id` 只在闭包内被引用，就把它们上提；又把 `localApi` 块和后续的 
+`const method/body/params` 合并下移。结果是：
+```js
+const EXPLICIT_ROUTES = {...};
+if (EXPLICIT_ROUTES[cleanPath]) return localApi[...];  // ❌ localApi 还在 TDZ
+// ...
+let resource, _id;  // ← 被 minifier 上提
+const method, body, params, localApi = {...};  // ← 被 minifier 下移合并
+```
+
+**修复**（minifier-safe 重构）：
+- 把 `let _id` 改成 `_state` mutable object (`const _state = { resource, id }`)
+- 预解析 `path.split('/')` 在函数顶部，闭包只读 `const` 变量
+- `localApi` 现在只依赖 `const` 变量 + `const _state` 属性访问，minifier 无论怎么重排都不会触发 TDZ
+- 删除了 `let resource, _id` 模式
+
+**文件**: `client/src/lib/api.js`（localRoute 函数完全重写）
+
+### Removed - 政治敏感问题 (5 → 3)
+
+- ❌ `drug-policy` (禁毒) — v1.2.0 已移除
+- ❌ `terrorism` (恐怖主义) — v1.2.0 已移除
+- ❌ `criminal-justice` (刑事司法改革) — v1.2.1 移除
+- ❌ `indigenous-rights` (原住民权利) — v1.2.1 移除
+- ❌ `misinformation` (打击虚假信息) — v1.2.1 移除
+
+**新增 3 个更安全的问题**:
+- ✅ `data-privacy` (数据隐私保护) — 差分隐私 + 同态加密 + TEE
+- ✅ `aging-population` (人口老龄化) — HALE 指标 + 养老金替代率
+- ✅ `digital-divide` (数字鸿沟) — ITU IDI 指数 + 公平接入
+
+**净问题数**: 203 → 201 (5 移除 + 3 新增)
+
+### Changed - 全面强化 formal 字段
+
+**问题**: 60+ 个问题的 `formal`（严格陈述）字段过于简单（仅 "> X metric" 形式），缺乏可证伪/可测量性。
+
+**修复**: 批量重写 100 个 formal 字段，按类别分模板：
+- **物理 (5)**: 加入公式 / 可观测量 / 可证伪判据 (e.g. `m_h = 125.1 GeV` vs `m_Pl = 10^17` 17 个数量级差距)
+- **化学 (13)**: 转化率 / TOF / 法拉第效率 / 能耗 + 表征方法 (XRD/XPS/operando XAS)
+- **生物 (13)**: 实验设计 (对照组/样本量/读数/验证) + 临床标准
+- **计算机 (11)**: 复杂度 / 渐近 / 基准 / 对抗鲁棒性 (e.g. `TOPS/W`, `TPS`, `ε-差分隐私`)
+- **哲学 (18)**: 问题 → 可测试假说 + 操作化 (e.g. "Trolley 跨文化 r ≥ 0.8", "fMRI 前扣带皮层激活")
+- **工程 (22)**: 规格 + 容差 + 失效模式 + 验证协议 (e.g. `T_m ≥ 50°C`, `M ≤ 3.0 地震`, `循环 1000 次`)
+- **社会 (20)**: 量化指标 + 测量方法 + 反事实 (e.g. `WHO UHC ≥ 80`, `WEF Gender Gap ≥ 0.9`)
+
+**示例**:
+- `criminal-justice` 旧: `> 监禁率 < 150/10 万、再犯率 < 30%。`
+  → `refugee` 新: `联合国难民署年安置需求满足率 ≥ 80%、第一年安置国家 ≥ 40 个且分配公平 (σ/μ ≤ 0.3)、难民 5 年内经济自给率 ≥ 70%、身心健康指标 (WHO-5) ≥ 对照人群 90%。`
+- `quantum-internet` 旧: `实现可扩展、长距离、容错的量子网络。`
+  → 新: `多节点量子网络：≥ 1000 节点纠缠分发、保真度 F ≥ 0.9、距离 ≥ 1000 km、延迟 < 100 ms、且对节点故障有鲁棒错误纠正。`
+
+**文件**: `deploy/gen_problems.py` (201 个 add() 调用，100 个 formal 强化)
+
+### Tech
+
+- `client/src/lib/problems.js` + `server/src/data/problems.js` — 重新生成 (201 题)
+- `client/index.html` — title/description 203 → 201
+- `deploy/gen_problems.py` — 含全部 201 题 + 强化 formal
+
 ## [1.2.0] - 2026-07-30
 
 ### 🎉 HardProblems 三大升级: 200+ 题库 + 视频介绍 + 用户贡献

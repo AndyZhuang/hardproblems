@@ -680,6 +680,20 @@ function localRoute(path, opts = {}) {
     const sp = new URLSearchParams(path.slice(qi + 1));
     for (const [k, v] of sp) query[k] = v;
   }
+  // 关键修复：把闭包需要的所有变量声明在 _state 对象里（mutable object），
+  // 避免 minifier 把 const 块重排导致 TDZ。
+  // 历史教训：v1.2.0 中 minifier 把 localApi 的 const 块下移，导致
+  //   "Cannot access 'y' before initialization"。
+  const method = opts.method || 'GET';
+  const body = opts.body || null;
+  const params = body || query;
+  // 预解析路径段：避免闭包依赖 let 声明的变量
+  const segs = cleanPath.replace(/^\//, '').split('/');
+  const seg0 = segs[0] || '';
+  const seg1 = segs[1] || '';
+  const seg2 = segs[2] || '';
+  // _state 是 mutable，闭包通过它读 resource/id —— safe for minifier
+  const _state = { resource: seg0, id: seg1 };
 
   // 显式路由表（覆盖模糊匹配）
   const EXPLICIT_ROUTES = {
@@ -698,59 +712,27 @@ function localRoute(path, opts = {}) {
     '/ai/contribute': 'contribute',
     '/health': 'health'
   };
-  if (EXPLICIT_ROUTES[cleanPath]) {
-    return localApi[EXPLICIT_ROUTES[cleanPath]]();
-  }
 
-  // 3 段路径：/chain/blocks/:id, /chain/transactions/:id, /chain/balance/:address, /chain/address/:address
-  const m3 = cleanPath.match(/^\/(\w+)\/(\w+)\/(\w+)$/);
-  if (m3) {
-    const [, r1, r2, r3] = m3;
-    if (r1 === 'chain' && r2 === 'blocks') return localImpl.block(r3);
-    if (r1 === 'chain' && r2 === 'transactions') return localImpl.transaction(r3);
-    if (r1 === 'chain' && r2 === 'balance') return localImpl.balance(r3);
-    if (r1 === 'chain' && r2 === 'address') return localImpl.address(r3, params || {});
-  }
-
-  // 4 段：/solutions/:id/vote, /solutions/:id/my-vote
-  const m4 = cleanPath.match(/^\/(\w+)\/(\w+)\/(\w+)$/);
-  if (m4 && m4[1] === 'solutions') {
-    const sid = m4[2];
-    const action = m4[3];
-    if (action === 'vote') return localImpl.vote(sid, body && body.value);
-    if (action === 'my-vote') return localImpl.myVote(sid);
-  }
-
-  // 简单路由器（id 允许 - 字母数字下划线）
-  const m = cleanPath.match(/^\/(\w+)(?:\/([\w-]+))?$/);
-  if (!m) throw new Error('Local route not found: ' + path);
-  let resource = m[1];
-  let id = m[2];
-  // 关键：/problems/:id 应该走 problem (单数)，不是 problems (列表)
-  if (resource === 'problems' && id) resource = 'problem';
-  const method = opts.method || 'GET';
-  const body = opts.body || null;
-  // body 优先，query 作为 fallback
-  const params = body || query;
-
+  // localApi 现在只依赖 const 变量（method/body/params/segs）和 _state（mutable），
+  // minifier 无论如何重排都不会触发 TDZ。
   const localApi = {
     health: () => ({ ok: true, time: Date.now(), mode: 'local' }),
     categories: () => localImpl.categories(),
     problems: () => localImpl.problems(params || {}),
-    problem: () => localImpl.problem(id),
+    problem: () => localImpl.problem(_state.id),
     solutions: () => {
       if (method === 'POST') return localImpl.submitSolution(body);
       return localImpl.solutions(params || {});
     },
-    vote: () => localImpl.vote(id, body && body.value),
+    vote: () => localImpl.vote(_state.id, body && body.value),
     leaderboard: () => localImpl.leaderboard(params || {}),
     stats: () => localImpl.stats(),
     chain: () => localImpl.chainInfo(),
     blocks: () => localImpl.blocks(params || {}),
-    block: () => localImpl.block(id),
+    block: () => localImpl.block(_state.id),
     transactions: () => localImpl.transactions(params || {}),
-    balance: () => localImpl.balance(id || path.split('/').pop()),
-    address: () => localImpl.address(id || path.split('/').slice(2).join('/'), params || {}),
+    balance: () => localImpl.balance(_state.id || segs[segs.length - 1]),
+    address: () => localImpl.address(_state.id || segs.slice(1).join('/'), params || {}),
     validate: () => localImpl.validate(),
     solve: () => localImpl.solve(body),
     evaluate: () => localImpl.evaluate(body),
@@ -760,18 +742,43 @@ function localRoute(path, opts = {}) {
     loginUser: () => localImpl.login(body),
     logout: () => { setToken(null); return { ok: true }; },
     users: () => {
-      if (method === 'POST' && !id) {
+      if (method === 'POST' && !_state.id) {
         if (body && body.username && body.password) {
           return body.bio !== undefined ? localImpl.register(body) : localImpl.login(body);
         }
       }
-      if (id) return localImpl.getUser(id);
+      if (_state.id) return localImpl.getUser(_state.id);
       throw new Error('users route invalid');
     }
   };
 
-  if (!localApi[resource]) throw new Error('Unknown resource: ' + resource);
-  return localApi[resource]();
+  if (EXPLICIT_ROUTES[cleanPath]) {
+    return localApi[EXPLICIT_ROUTES[cleanPath]]();
+  }
+
+  // 3 段路径：/chain/blocks/:id, /chain/transactions/:id, /chain/balance/:address, /chain/address/:address
+  if (segs.length === 3 && seg0 === 'chain') {
+    if (seg1 === 'blocks') return localImpl.block(seg2);
+    if (seg1 === 'transactions') return localImpl.transaction(seg2);
+    if (seg1 === 'balance') return localImpl.balance(seg2);
+    if (seg1 === 'address') return localImpl.address(seg2, params || {});
+  }
+  // /solutions/:id/vote, /solutions/:id/my-vote
+  if (segs.length === 3 && seg0 === 'solutions') {
+    if (seg2 === 'vote') return localImpl.vote(seg1, body && body.value);
+    if (seg2 === 'my-vote') return localImpl.myVote(seg1);
+  }
+
+  // 简单路由器
+  if (!seg0) throw new Error('Local route not found: ' + path);
+  let actualResource = seg0;
+  if (seg0 === 'problems' && seg1) actualResource = 'problem';
+  // 同步到 _state（id 已经在 seg1 中）
+  _state.resource = seg0;
+  _state.id = seg1;
+
+  if (!localApi[actualResource]) throw new Error('Unknown resource: ' + seg0);
+  return localApi[actualResource]();
 }
 
 export const api = {
