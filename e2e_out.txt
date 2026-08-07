@@ -1,0 +1,83 @@
+﻿   First problem href: /problems/millennium-riemann
+   Current path: /problems/millennium-riemann | H1: 黎曼猜想
+   Body snippet: 📱 把 HardProblems 安装到桌面，随时查看
+安装到桌面
+✕
+HardProblems
+.world
+硬问题
+提交问题
+排行榜
+区块链
+201 题
+0 答
+0 人
+🌐
+中
+登录 / 注册
+← 返回问题列表
+未解
+极难
+mathematics
+1859 · Bernhard Riemann
+黎曼猜想
+Riemann Hypothesis
+
+素数在自然数中出现的规律，到底有没有完美的数学解释？
+
+#千禧年问题
+#数论
+#素数
+⚡ 奖励 5000 HPW
+🎬
+Riemann's Prime Numbers — 3Blue1Brown
+3Blue1Brown
+🙋 我能怎么参与？
+
+不需要你是专家。以下任何方式都能帮到这道问题：
+
+🧠
+尝试求解/证明
+
+尝试证明所有非平凡零点在临界线上
+
+💻
+写代码/算法
+
+用 Python/SageMath 数值计算前 10¹² 个零点验证
+
+📚
+文献综述
+
+阅读 Bombieri 的零点评述
+
+💬
+想法/讨论
+
+在 MathOverflow 跟踪最新讨论
+
+💡 不确定怎么做？直接 问 AI，或在 排行榜 找合作者。
+🧒
+小朋友版
+   API test: { status: 200 }
+
+=== Test Results ===
+✅ Home shows 201 problems
+✅ Problems list shows 201 cards
+✅ Problem detail opened: 黎曼猜想
+✅ Video section visible
+✅ Participate section visible
+✅ Contribute page loaded: ✍️ 提交一个新问题
+✅ Category math selected
+✅ AI expand button clicked
+✅ AI generated form visible
+✅ English language works
+✅ Chain page works: ⛓ Blockchain explorer
+✅ Leaderboard works: 🏆 Leaderboard
+
+=== Browser Errors ===
+   requestfailed: https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap - net::ERR_CONNECTION_CLOSED
+   console.error: Failed to load resource: net::ERR_CONNECTION_CLOSED
+   requestfailed: https://www.youtube.com/embed/zlm1axtsNIY - net::ERR_ABORTED
+
+12/12 passed

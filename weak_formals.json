@@ -1,0 +1,614 @@
+[
+  {
+    "id": "hierarchy-problem",
+    "category": "physics",
+    "title": "等级问题",
+    "formal": "为什么电弱标度在普朗克标度下是稳定的？"
+  },
+  {
+    "id": "arrow-of-time",
+    "category": "physics",
+    "title": "时间之箭",
+    "formal": "解释时间不对称性的来源和宇宙学起源。"
+  },
+  {
+    "id": "vacuum-decay",
+    "category": "physics",
+    "title": "真空衰变",
+    "formal": "计算假真空寿命的精确值。"
+  },
+  {
+    "id": "dark-photon",
+    "category": "physics",
+    "title": "暗光子",
+    "formal": "探测或排除暗光子作为暗物质。"
+  },
+  {
+    "id": "holographic",
+    "category": "physics",
+    "title": "全息原理",
+    "formal": "构造对一般时空的全息描述。"
+  },
+  {
+    "id": "nitrogen-fixation",
+    "category": "chemistry",
+    "title": "常温常压固氮",
+    "formal": "设计一种催化剂在 ≤ 100°C 和 ≤ 10 atm 下实现高转化率氨合成。"
+  },
+  {
+    "id": "carbon-capture",
+    "category": "chemistry",
+    "title": "低成本碳捕集",
+    "formal": "实现 < 50 美元/吨的 CO₂ 捕集且能耗 < 2 GJ/吨。"
+  },
+  {
+    "id": "protein-design",
+    "category": "chemistry",
+    "title": "从头设计蛋白质",
+    "formal": "为任意目标几何/化学功能设计稳定、可溶、高活性的新蛋白质。"
+  },
+  {
+    "id": "water-splitting",
+    "category": "chemistry",
+    "title": "水分解催化剂",
+    "formal": "开发 < 100 mV 过电位下 10 mA/cm² 且 1000 小时稳定的 OER/HER 催化剂。"
+  },
+  {
+    "id": "co2-to-fuel",
+    "category": "chemistry",
+    "title": "CO₂ 变燃料",
+    "formal": "开发 > 50% 法拉第效率、> 1000 小时稳定的 CO₂-to-液体燃料 催化剂。"
+  },
+  {
+    "id": "li-air-battery",
+    "category": "chemistry",
+    "title": "锂空气电池",
+    "formal": "实现 > 1000 Wh/kg 实际能量密度、> 500 次循环的 Li-air 电池。"
+  },
+  {
+    "id": "enzyme-design",
+    "category": "chemistry",
+    "title": "从头设计酶",
+    "formal": "设计对任意目标反应有 > 10³ 倍速率提升的酶。"
+  },
+  {
+    "id": "cnt-bulk",
+    "category": "chemistry",
+    "title": "碳纳米管批量生产",
+    "formal": "> 99.9% 纯度、< 5% 缺陷率、< 100 美元/公斤 的碳纳米管生产。"
+  },
+  {
+    "id": "graphene-app",
+    "category": "chemistry",
+    "title": "石墨烯实际应用",
+    "formal": "> 1 m 直径、< 10 Ω/sq 电阻、< 100 美元/m² 的石墨烯薄膜生产。"
+  },
+  {
+    "id": "artificial-photo",
+    "category": "chemistry",
+    "title": "人工光合作用",
+    "formal": "实现 > 10% 太阳能到燃料能量转换效率且稳定运行 > 1000 小时。"
+  },
+  {
+    "id": "lithium-sulfur",
+    "category": "chemistry",
+    "title": "锂硫电池",
+    "formal": "> 500 Wh/kg、> 1000 次循环的锂硫电池。"
+  },
+  {
+    "id": "molecular-machine-chem",
+    "category": "chemistry",
+    "title": "分子机器化学合成",
+    "formal": "化学合成能完成复杂任务的纳米分子机器。"
+  },
+  {
+    "id": "whole-brain-emulation",
+    "category": "biology",
+    "title": "全脑模拟",
+    "formal": "实现哺乳动物（线虫→果蝇→小鼠→人）完整大脑的连接组重建和功能模拟。"
+  },
+  {
+    "id": "gene-drive",
+    "category": "biology",
+    "title": "基因驱动",
+    "formal": "设计安全、可控、可逆的基因驱动系统。"
+  },
+  {
+    "id": "xenotransplant",
+    "category": "biology",
+    "title": "异种器官移植",
+    "formal": "实现猪到人的长期存活（>5 年）异种器官移植。"
+  },
+  {
+    "id": "universal-flu",
+    "category": "biology",
+    "title": "通用流感疫苗",
+    "formal": "开发对所有甲型流感病毒亚型有效的疫苗。"
+  },
+  {
+    "id": "malaria-eradication",
+    "category": "biology",
+    "title": "疟疾根除",
+    "formal": "全球疟疾病例降到 0 并维持。"
+  },
+  {
+    "id": "telomere-extend",
+    "category": "biology",
+    "title": "端粒延长与衰老",
+    "formal": "安全延长人类端粒并证明延缓衰老效果。"
+  },
+  {
+    "id": "stem-cell-therapy",
+    "category": "biology",
+    "title": "干细胞治疗",
+    "formal": "对指定组织类型安全、有效的干细胞治疗。"
+  },
+  {
+    "id": "organoid-intelligence",
+    "category": "biology",
+    "title": "类器官智能",
+    "formal": "证明脑类器官具有学习能力且伦理可控。"
+  },
+  {
+    "id": "biolocomotion",
+    "category": "biology",
+    "title": "生物运动原理",
+    "formal": "建立从分子到生物体的运动统一理论。"
+  },
+  {
+    "id": "bioluminescence",
+    "category": "biology",
+    "title": "生物发光工程",
+    "formal": "使整株植物持续可见光发光且不影响生长。"
+  },
+  {
+    "id": "synthetic-genome",
+    "category": "biology",
+    "title": "合成基因组",
+    "formal": "实现任意真核生物的完整基因组合成和移植。"
+  },
+  {
+    "id": "plant-intelligence",
+    "category": "biology",
+    "title": "植物智能",
+    "formal": "建立植物行为的智能/计算模型。"
+  },
+  {
+    "id": "photosynthesis-eff",
+    "category": "biology",
+    "title": "光合效率提升",
+    "formal": "通过 RuBisCO 工程 / C4 通路 / 光呼吸消除提升光合效率。"
+  },
+  {
+    "id": "software-verification",
+    "category": "cs",
+    "title": "软件形式化验证",
+    "formal": "对真实规模的工业代码（10⁵-10⁷ 行）实现全自动验证。"
+  },
+  {
+    "id": "quantum-internet",
+    "category": "cs",
+    "title": "量子互联网",
+    "formal": "实现可扩展、长距离、容错的量子网络。"
+  },
+  {
+    "id": "translation-parity",
+    "category": "cs",
+    "title": "通用机器翻译",
+    "formal": "在任何语言对、任何领域达到专业人类翻译水平。"
+  },
+  {
+    "id": "crypto-scale",
+    "category": "cs",
+    "title": "可扩展区块链",
+    "formal": "实现 > 10000 TPS 的去中心化区块链且不牺牲安全性。"
+  },
+  {
+    "id": "federated-learning",
+    "category": "cs",
+    "title": "联邦学习",
+    "formal": "实现通信高效、鲁棒、保护隐私的联邦学习系统。"
+  },
+  {
+    "id": "neuromorphic",
+    "category": "cs",
+    "title": "神经形态计算",
+    "formal": "> 10x GPU 的能效比（TOPS/W）且能跑现代 AI 模型。"
+  },
+  {
+    "id": "photonic-compute",
+    "category": "cs",
+    "title": "光子计算",
+    "formal": "> 100x GPU 能效比且保持精度的光子计算。"
+  },
+  {
+    "id": "3d-chip",
+    "category": "cs",
+    "title": "3D 堆叠芯片",
+    "formal": "实现 100 TB/s 内存带宽的 3D 堆叠芯片。"
+  },
+  {
+    "id": "energy-ai",
+    "category": "cs",
+    "title": "能源高效 AI",
+    "formal": "> 100x 现有 AI 模型的能效（按 FLOP/W 衡量）。"
+  },
+  {
+    "id": "post-quantum",
+    "category": "cs",
+    "title": "后量子密码",
+    "formal": "> 10⁶ 个量子比特也能保证安全的加密。"
+  },
+  {
+    "id": "zkp-scale",
+    "category": "cs",
+    "title": "可扩展零知识证明",
+    "formal": "> 10⁶ 证明/秒且证明大小常数。"
+  },
+  {
+    "id": "moral-objectivity",
+    "category": "philosophy",
+    "title": "道德客观性",
+    "formal": "道德真理是否有客观、独立于人类的标准？"
+  },
+  {
+    "id": "zombie-thought",
+    "category": "philosophy",
+    "title": "哲学僵尸",
+    "formal": "哲学僵尸在概念上是否可能？"
+  },
+  {
+    "id": "truth",
+    "category": "philosophy",
+    "title": "真理的本质",
+    "formal": "真理是否有统一的本质？"
+  },
+  {
+    "id": "beauty",
+    "category": "philosophy",
+    "title": "美的本质",
+    "formal": "美的本质是否能被还原为客观特征？"
+  },
+  {
+    "id": "death-philosophy",
+    "category": "philosophy",
+    "title": "死亡哲学",
+    "formal": "死亡在什么意义上是坏事？"
+  },
+  {
+    "id": "mind-body",
+    "category": "philosophy",
+    "title": "心物关系",
+    "formal": "心灵与身体的关系是什么？"
+  },
+  {
+    "id": "is-ought",
+    "category": "philosophy",
+    "title": "休谟法则",
+    "formal": "是否可能从纯事实推出价值判断？"
+  },
+  {
+    "id": "justice",
+    "category": "philosophy",
+    "title": "正义理论",
+    "formal": "公平的分配原则是什么？"
+  },
+  {
+    "id": "liberty",
+    "category": "philosophy",
+    "title": "自由与权威",
+    "formal": "自由与权威的合理边界是什么？"
+  },
+  {
+    "id": "property",
+    "category": "philosophy",
+    "title": "财产理论",
+    "formal": "私有财产的正当性基础是什么？"
+  },
+  {
+    "id": "authority-phil",
+    "category": "philosophy",
+    "title": "国家权威",
+    "formal": "国家权威的正当性来源。"
+  },
+  {
+    "id": "equality",
+    "category": "philosophy",
+    "title": "平等",
+    "formal": "平等是机会、结果、还是资源？"
+  },
+  {
+    "id": "punishment",
+    "category": "philosophy",
+    "title": "惩罚理论",
+    "formal": "惩罚的正当性根据是什么？"
+  },
+  {
+    "id": "marriage-phil",
+    "category": "philosophy",
+    "title": "婚姻哲学",
+    "formal": "婚姻的本质和正当性。"
+  },
+  {
+    "id": "beauty-objective",
+    "category": "philosophy",
+    "title": "审美判断",
+    "formal": "审美判断的普遍性根据。"
+  },
+  {
+    "id": "trolley",
+    "category": "philosophy",
+    "title": "电车难题",
+    "formal": "功利主义 vs 义务论的直观冲突。"
+  },
+  {
+    "id": "teleport",
+    "category": "philosophy",
+    "title": "传送悖论",
+    "formal": "传送机涉及的人格同一性问题。"
+  },
+  {
+    "id": "newcomb",
+    "category": "philosophy",
+    "title": "Newcomb 悖论",
+    "formal": "决策论 vs 因果论。"
+  },
+  {
+    "id": "fusion",
+    "category": "engineering",
+    "title": "可控核聚变",
+    "formal": "实现 Q > 10 的稳态聚变反应堆。"
+  },
+  {
+    "id": "space-elevator",
+    "category": "engineering",
+    "title": "太空电梯",
+    "formal": "实现 > 36000 km 长度、> 60 GPa 强度、< 1.3 g/cm³ 密度的缆绳材料。"
+  },
+  {
+    "id": "reusable-rocket",
+    "category": "engineering",
+    "title": "完全可重复火箭",
+    "formal": "> 100 次重复使用且无大修。"
+  },
+  {
+    "id": "bci",
+    "category": "engineering",
+    "title": "脑机接口",
+    "formal": "> 1 Mbps 带宽、长期稳定的脑机接口。"
+  },
+  {
+    "id": "cheap-solar-fuel",
+    "category": "engineering",
+    "title": "人造叶子",
+    "formal": "> 10% 太阳能-燃料效率、> 1000 小时稳定的人造叶子。"
+  },
+  {
+    "id": "hydrogen-storage",
+    "category": "engineering",
+    "title": "常温常压储氢",
+    "formal": "> 7% 重量密度、可逆循环 > 500 次、安全且廉价的常温常压储氢。"
+  },
+  {
+    "id": "nuclear-waste",
+    "category": "engineering",
+    "title": "核废料长期处置",
+    "formal": "> 10 万年安全且不可逆泄漏的核废料处置。"
+  },
+  {
+    "id": "asteroid-mining",
+    "category": "engineering",
+    "title": "小行星采矿",
+    "formal": "> 1000 公斤/年从小行星运回地球的成本 < 100 万美元。"
+  },
+  {
+    "id": "floating-cities",
+    "category": "engineering",
+    "title": "海上漂浮城市",
+    "formal": "> 1000 人、可持续能源、淡水的海上漂浮社区。"
+  },
+  {
+    "id": "earthquake-pred",
+    "category": "engineering",
+    "title": "地震预测",
+    "formal": "> 80% 准确率、> 1 天提前的地震预测。"
+  },
+  {
+    "id": "self-healing-infra",
+    "category": "engineering",
+    "title": "自修复基础设施",
+    "formal": "> 0.5 mm 宽裂缝完全自修复、寿命延长 50%。"
+  },
+  {
+    "id": "programmable-matter",
+    "category": "engineering",
+    "title": "可编程物质",
+    "formal": "> 1 cm 单元的、毫秒级响应的可编程物质。"
+  },
+  {
+    "id": "vertical-farming",
+    "category": "engineering",
+    "title": "垂直农业规模化",
+    "formal": "> 90% 城市粮食由垂直农场供应且经济可行。"
+  },
+  {
+    "id": "synthetic-meat",
+    "category": "engineering",
+    "title": "植物肉升级",
+    "formal": "> 在 5 项感官测试中让 80% 消费者分不清真假。"
+  },
+  {
+    "id": "plastic-enzyme",
+    "category": "engineering",
+    "title": "塑料吃酶规模化",
+    "formal": "> 10 吨/天 工厂级、< 1 美元/公斤 处理成本。"
+  },
+  {
+    "id": "self-driving-l5",
+    "category": "engineering",
+    "title": "L5 自动驾驶",
+    "formal": "> 在所有合法路况、所有天气下不需人接管的自动驾驶。"
+  },
+  {
+    "id": "drone-delivery",
+    "category": "engineering",
+    "title": "无人机物流",
+    "formal": "> 50 公里半径、< 1 小时送达、< 5 美元/单的无人机物流。"
+  },
+  {
+    "id": "modular-nuclear",
+    "category": "engineering",
+    "title": "模块化核反应堆",
+    "formal": "> 商业可部署的 < 300 MWe SMR 单元。"
+  },
+  {
+    "id": "tidal-energy",
+    "category": "engineering",
+    "title": "潮汐能规模化",
+    "formal": "> 100 MW 商业化潮汐能。"
+  },
+  {
+    "id": "geothermal",
+    "category": "engineering",
+    "title": "增强型地热",
+    "formal": "> 商业可行的 5-10 MW 增强型地热井。"
+  },
+  {
+    "id": "solar-geoengineering",
+    "category": "engineering",
+    "title": "太阳地球工程",
+    "formal": "> 可控、可逆、影响小的太阳地球工程方案。"
+  },
+  {
+    "id": "sustainable-energy",
+    "category": "social",
+    "title": "全球能源转型",
+    "formal": "> 2050 年前全球净零碳排放。"
+  },
+  {
+    "id": "education-reform",
+    "category": "social",
+    "title": "教育规模化个性化",
+    "formal": "> AI 个性化教学效果等于或超过 1 对 1 教师。"
+  },
+  {
+    "id": "polarization",
+    "category": "social",
+    "title": "社会极化",
+    "formal": "> 显著降低政治极化指数。"
+  },
+  {
+    "id": "longevity-equity",
+    "category": "social",
+    "title": "延寿公平性",
+    "formal": "> 全球预期寿命差距 < 5 年。"
+  },
+  {
+    "id": "ubi",
+    "category": "social",
+    "title": "全民基本收入",
+    "formal": "> 长期大规模 UBI 试验对就业、幸福感的因果效应。"
+  },
+  {
+    "id": "privacy-digital",
+    "category": "social",
+    "title": "数字时代隐私",
+    "formal": "> 让个人在数字生活中拥有有意义的信息控制权。"
+  },
+  {
+    "id": "digital-democracy",
+    "category": "social",
+    "title": "数字民主",
+    "formal": "> 数字民主对参与度、政策质量的影响。"
+  },
+  {
+    "id": "open-data",
+    "category": "social",
+    "title": "开放政府数据",
+    "formal": "> 80% 政府关键数据集实时公开且机器可读。"
+  },
+  {
+    "id": "universal-health",
+    "category": "social",
+    "title": "全民医保",
+    "formal": "> 80% 国家人口医保覆盖 < 30% 自费。"
+  },
+  {
+    "id": "affordable-housing",
+    "category": "social",
+    "title": "可负担住房",
+    "formal": "> 住房成本 < 30% 家庭收入。"
+  },
+  {
+    "id": "remote-work",
+    "category": "social",
+    "title": "远程工作未来",
+    "formal": "> 远程工作对生产率、社会凝聚的影响。"
+  },
+  {
+    "id": "ai-governance",
+    "category": "social",
+    "title": "AI 治理",
+    "formal": "> 全球协调、有约束力的 AI 治理框架。"
+  },
+  {
+    "id": "bio-enhancement",
+    "category": "social",
+    "title": "生物增强伦理",
+    "formal": "> 生物增强对个人和社会的影响框架。"
+  },
+  {
+    "id": "climate-migration",
+    "category": "social",
+    "title": "气候移民",
+    "formal": "> 全球协调、有尊严的气候移民框架。"
+  },
+  {
+    "id": "refugee",
+    "category": "social",
+    "title": "难民危机",
+    "formal": "> 全球协调、有尊严的难民安置。"
+  },
+  {
+    "id": "aging-population",
+    "category": "social",
+    "title": "人口老龄化",
+    "formal": "> 65+ 健康预期寿命 (HALE) 提升 ≥ 3 年 / 10 年；养老金替代率 ≥ 60% 且财政可持续；医疗 + 长期照护支出占 GDP 比例稳定 ≤ 8% 同时 HALE 继续增长（不存在\"压缩\" vs \"扩张\" 的权衡悖论）。"
+  },
+  {
+    "id": "education-access",
+    "category": "social",
+    "title": "教育公平",
+    "formal": "> 全球失学率 < 5% 且学习质量达标。"
+  },
+  {
+    "id": "gender-equity",
+    "category": "social",
+    "title": "性别平等",
+    "formal": "> 全球性别收入差 < 10%、议会代表 > 40%。"
+  },
+  {
+    "id": "digital-divide",
+    "category": "social",
+    "title": "数字鸿沟",
+    "formal": "> ITU IDI 指数 < 0.1（\"已连接 vs 未连接\"差距），按年龄/收入/城乡/性别/残障维度所有交叉子群的 IDI 都 ≥ 全球中位数 - 1σ。"
+  },
+  {
+    "id": "voice-cloning-rights",
+    "category": "social",
+    "title": "语音克隆权",
+    "formal": "声音权利的法律和技术框架。"
+  },
+  {
+    "id": "molecular-medicine",
+    "category": "chemistry",
+    "title": "分子医学",
+    "formal": "> 80% 患者从基因组指导的治疗中获益。"
+  },
+  {
+    "id": "sustainable-concrete",
+    "category": "engineering",
+    "title": "可持续混凝土",
+    "formal": "水泥生产碳排放减少 50% 且成本可比。"
+  }
+]

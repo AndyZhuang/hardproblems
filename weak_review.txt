@@ -1,0 +1,116 @@
+﻿
+===== biology (13) =====
+  [whole-brain-emulation] (34) 实现哺乳动物（线虫→果蝇→小鼠→人）完整大脑的连接组重建和功能模拟。
+  [gene-drive] (18) 设计安全、可控、可逆的基因驱动系统。
+  [xenotransplant] (23) 实现猪到人的长期存活（>5 年）异种器官移植。
+  [universal-flu] (19) 开发对所有甲型流感病毒亚型有效的疫苗。
+  [malaria-eradication] (15) 全球疟疾病例降到 0 并维持。
+  [telomere-extend] (18) 安全延长人类端粒并证明延缓衰老效果。
+  [stem-cell-therapy] (19) 对指定组织类型安全、有效的干细胞治疗。
+  [organoid-intelligence] (18) 证明脑类器官具有学习能力且伦理可控。
+  [biolocomotion] (17) 建立从分子到生物体的运动统一理论。
+  [bioluminescence] (19) 使整株植物持续可见光发光且不影响生长。
+  [synthetic-genome] (20) 实现任意真核生物的完整基因组合成和移植。
+  [plant-intelligence] (15) 建立植物行为的智能/计算模型。
+  [photosynthesis-eff] (36) 通过 RuBisCO 工程 / C4 通路 / 光呼吸消除提升光合效率。
+
+===== chemistry (13) =====
+  [nitrogen-fixation] (39) 设计一种催化剂在 ≤ 100°C 和 ≤ 10 atm 下实现高转化率氨合成。
+  [carbon-capture] (33) 实现 < 50 美元/吨的 CO₂ 捕集且能耗 < 2 GJ/吨。
+  [protein-design] (29) 为任意目标几何/化学功能设计稳定、可溶、高活性的新蛋白质。
+  [water-splitting] (52) 开发 < 100 mV 过电位下 10 mA/cm² 且 1000 小时稳定的 OER/HER 催化剂。
+  [co2-to-fuel] (44) 开发 > 50% 法拉第效率、> 1000 小时稳定的 CO₂-to-液体燃料 催化剂。
+  [li-air-battery] (44) 实现 > 1000 Wh/kg 实际能量密度、> 500 次循环的 Li-air 电池。
+  [enzyme-design] (25) 设计对任意目标反应有 > 10³ 倍速率提升的酶。
+  [cnt-bulk] (40) > 99.9% 纯度、< 5% 缺陷率、< 100 美元/公斤 的碳纳米管生产。
+  [graphene-app] (43) > 1 m 直径、< 10 Ω/sq 电阻、< 100 美元/m² 的石墨烯薄膜生产。
+  [artificial-photo] (37) 实现 > 10% 太阳能到燃料能量转换效率且稳定运行 > 1000 小时。
+  [lithium-sulfur] (28) > 500 Wh/kg、> 1000 次循环的锂硫电池。
+  [molecular-machine-chem] (19) 化学合成能完成复杂任务的纳米分子机器。
+  [molecular-medicine] (21) > 80% 患者从基因组指导的治疗中获益。
+
+===== cs (11) =====
+  [software-verification] (29) 对真实规模的工业代码（10⁵-10⁷ 行）实现全自动验证。
+  [quantum-internet] (18) 实现可扩展、长距离、容错的量子网络。
+  [translation-parity] (22) 在任何语言对、任何领域达到专业人类翻译水平。
+  [crypto-scale] (31) 实现 > 10000 TPS 的去中心化区块链且不牺牲安全性。
+  [federated-learning] (22) 实现通信高效、鲁棒、保护隐私的联邦学习系统。
+  [neuromorphic] (34) > 10x GPU 的能效比（TOPS/W）且能跑现代 AI 模型。
+  [photonic-compute] (25) > 100x GPU 能效比且保持精度的光子计算。
+  [3d-chip] (26) 实现 100 TB/s 内存带宽的 3D 堆叠芯片。
+  [energy-ai] (32) > 100x 现有 AI 模型的能效（按 FLOP/W 衡量）。
+  [post-quantum] (21) > 10⁶ 个量子比特也能保证安全的加密。
+  [zkp-scale] (18) > 10⁶ 证明/秒且证明大小常数。
+
+===== engineering (22) =====
+  [fusion] (19) 实现 Q > 10 的稳态聚变反应堆。
+  [space-elevator] (49) 实现 > 36000 km 长度、> 60 GPa 强度、< 1.3 g/cm³ 密度的缆绳材料。
+  [reusable-rocket] (16) > 100 次重复使用且无大修。
+  [bci] (22) > 1 Mbps 带宽、长期稳定的脑机接口。
+  [cheap-solar-fuel] (32) > 10% 太阳能-燃料效率、> 1000 小时稳定的人造叶子。
+  [hydrogen-storage] (36) > 7% 重量密度、可逆循环 > 500 次、安全且廉价的常温常压储氢。
+  [nuclear-waste] (22) > 10 万年安全且不可逆泄漏的核废料处置。
+  [asteroid-mining] (33) > 1000 公斤/年从小行星运回地球的成本 < 100 万美元。
+  [floating-cities] (25) > 1000 人、可持续能源、淡水的海上漂浮社区。
+  [earthquake-pred] (23) > 80% 准确率、> 1 天提前的地震预测。
+  [self-healing-infra] (27) > 0.5 mm 宽裂缝完全自修复、寿命延长 50%。
+  [programmable-matter] (23) > 1 cm 单元的、毫秒级响应的可编程物质。
+  [vertical-farming] (23) > 90% 城市粮食由垂直农场供应且经济可行。
+  [synthetic-meat] (27) > 在 5 项感官测试中让 80% 消费者分不清真假。
+  [plastic-enzyme] (28) > 10 吨/天 工厂级、< 1 美元/公斤 处理成本。
+  [self-driving-l5] (26) > 在所有合法路况、所有天气下不需人接管的自动驾驶。
+  [drone-delivery] (34) > 50 公里半径、< 1 小时送达、< 5 美元/单的无人机物流。
+  [modular-nuclear] (26) > 商业可部署的 < 300 MWe SMR 单元。
+  [tidal-energy] (16) > 100 MW 商业化潮汐能。
+  [geothermal] (23) > 商业可行的 5-10 MW 增强型地热井。
+  [solar-geoengineering] (21) > 可控、可逆、影响小的太阳地球工程方案。
+  [sustainable-concrete] (20) 水泥生产碳排放减少 50% 且成本可比。
+
+===== philosophy (18) =====
+  [moral-objectivity] (19) 道德真理是否有客观、独立于人类的标准？
+  [zombie-thought] (13) 哲学僵尸在概念上是否可能？
+  [truth] (11) 真理是否有统一的本质？
+  [beauty] (16) 美的本质是否能被还原为客观特征？
+  [death-philosophy] (12) 死亡在什么意义上是坏事？
+  [mind-body] (12) 心灵与身体的关系是什么？
+  [is-ought] (15) 是否可能从纯事实推出价值判断？
+  [justice] (11) 公平的分配原则是什么？
+  [liberty] (14) 自由与权威的合理边界是什么？
+  [property] (14) 私有财产的正当性基础是什么？
+  [authority-phil] (11) 国家权威的正当性来源。
+  [equality] (14) 平等是机会、结果、还是资源？
+  [punishment] (12) 惩罚的正当性根据是什么？
+  [marriage-phil] (10) 婚姻的本质和正当性。
+  [beauty-objective] (11) 审美判断的普遍性根据。
+  [trolley] (17) 功利主义 vs 义务论的直观冲突。
+  [teleport] (14) 传送机涉及的人格同一性问题。
+  [newcomb] (11) 决策论 vs 因果论。
+
+===== physics (5) =====
+  [hierarchy-problem] (19) 为什么电弱标度在普朗克标度下是稳定的？
+  [arrow-of-time] (18) 解释时间不对称性的来源和宇宙学起源。
+  [vacuum-decay] (12) 计算假真空寿命的精确值。
+  [dark-photon] (14) 探测或排除暗光子作为暗物质。
+  [holographic] (13) 构造对一般时空的全息描述。
+
+===== social (20) =====
+  [sustainable-energy] (17) > 2050 年前全球净零碳排放。
+  [education-reform] (27) > AI 个性化教学效果等于或超过 1 对 1 教师。
+  [polarization] (13) > 显著降低政治极化指数。
+  [longevity-equity] (17) > 全球预期寿命差距 < 5 年。
+  [ubi] (27) > 长期大规模 UBI 试验对就业、幸福感的因果效应。
+  [privacy-digital] (23) > 让个人在数字生活中拥有有意义的信息控制权。
+  [digital-democracy] (19) > 数字民主对参与度、政策质量的影响。
+  [open-data] (23) > 80% 政府关键数据集实时公开且机器可读。
+  [universal-health] (24) > 80% 国家人口医保覆盖 < 30% 自费。
+  [affordable-housing] (18) > 住房成本 < 30% 家庭收入。
+  [remote-work] (19) > 远程工作对生产率、社会凝聚的影响。
+  [ai-governance] (21) > 全球协调、有约束力的 AI 治理框架。
+  [bio-enhancement] (18) > 生物增强对个人和社会的影响框架。
+  [climate-migration] (18) > 全球协调、有尊严的气候移民框架。
+  [refugee] (16) > 全球协调、有尊严的难民安置。
+  [aging-population] (119) > 65+ 健康预期寿命 (HALE) 提升 ≥ 3 年 / 10 年；养老金替代率 ≥ 60% 且财政可持续；医疗 + 长期照护支出占 GDP 比例稳定 ≤ 8% 同时 HALE 继续增长（不存在"压缩" vs "扩张" 的权衡悖论）。
+  [education-access] (21) > 全球失学率 < 5% 且学习质量达标。
+  [gender-equity] (27) > 全球性别收入差 < 10%、议会代表 > 40%。
+  [digital-divide] (79) > ITU IDI 指数 < 0.1（"已连接 vs 未连接"差距），按年龄/收入/城乡/性别/残障维度所有交叉子群的 IDI 都 ≥ 全球中位数 - 1σ。
+  [voice-cloning-rights] (13) 声音权利的法律和技术框架。
