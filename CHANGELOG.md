@@ -5,6 +5,30 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-08-07
+
+### 🗑 Removed - 用户提交问题模块 (Contribute)
+
+**删除 `/contribute` 页面 + 全部相关代码**：
+- ❌ `client/src/pages/Contribute.jsx` (已归档到 `_archive/`)
+- ❌ 路由 `<Route path="contribute" />`
+- ❌ 导航栏 `+ 提交问题` 链接
+- ❌ i18n 键 `nav.contribute` (zh-CN + en-US)
+- ❌ 前端 `api.contributeProblem()` + `localAIcontribute()` 启发式 (90 行)
+- ❌ 后端 `POST /ai/contribute` 路由 (90 行)
+- ❌ `EXPLICIT_ROUTES` 中的 `/ai/contribute` 项
+
+**侧边栏改造**：
+- 详情页右下「推荐一个类似问题」卡片 → 改为「分享这道硬问题」卡片
+- 调用 `navigator.share()` (Web Share API) / fallback 到剪贴板
+
+**Bundle 体积**: 414 KB → 399 KB JS (节省 15 KB)
+**模块数**: 59 → 58
+
+### Why
+
+用户反馈：把硬问题列表的"质量门控"交还给维护者，避免质量参差；专注 AI 解答 + 链上积分这条主线。
+
 ## [1.2.1] - 2026-07-30
 
 ### 🐛 Critical Fix + 内容强化

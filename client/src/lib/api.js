@@ -459,9 +459,6 @@ const localImpl = {
   },
   evaluate({ problem_id, content }) {
     return localAIeval(problem_id, content);
-  },
-  contribute({ rough_idea, category, extra_hints }) {
-    return Promise.resolve(localAIcontribute(rough_idea, category, extra_hints));
   }
 };
 
@@ -542,99 +539,6 @@ function localAIeval(problemId, content) {
   };
 }
 
-// AI 帮用户扩展粗略想法 → 完整问题
-function localAIcontribute(roughIdea, category, extraHints) {
-  const idea = (roughIdea || '').trim();
-  if (!idea) throw new Error('想法不能为空');
-
-  const cat = (CATEGORIES || []).find(c => c.id === category) || { id: 'philosophy', name: '跨学科' };
-  const catName = cat.name;
-  const extra = (extraHints || '').trim();
-
-  // 关键词检测
-  const hasAI = /ai|人工智能|gpt|llm|chatgpt|大模型|神经网络|深度学习/i.test(idea);
-  const hasConsciousness = /意识|consciou|主观|感受|qualia|心灵|心智|思考/i.test(idea);
-  const hasClimate = /气候|环境|碳|暖|co2|塑料|污染|海洋|能源/i.test(idea);
-  const hasHealth = /健康|疾病|癌症|长寿|衰老|医|病毒|基因/i.test(idea);
-  const hasMath = /数|证明|方程|猜想|函数|无穷|素数/i.test(idea);
-  const hasCS = /算法|ai|计算机|代码|编程|程序|数据|网络/i.test(idea);
-  const hasSociety = /社会|人|法律|公正|贫富|不平等|自由|教育/i.test(idea);
-
-  // 推断英文标题
-  let titleEn = '';
-  if (hasAI) titleEn = 'User Question on AI/AGI';
-  else if (hasConsciousness) titleEn = 'User Question on Consciousness';
-  else if (hasClimate) titleEn = 'User Question on Climate/Sustainability';
-  else if (hasHealth) titleEn = 'User Question on Health/Aging';
-  else if (hasMath) titleEn = 'User Question on Mathematics';
-  else if (hasCS) titleEn = 'User Question on Computing';
-  else if (hasSociety) titleEn = 'User Question on Society';
-  else titleEn = 'User Question on ' + (catName);
-
-  // 智能生成 kid 版
-  const kid = `想象你在问："${idea.slice(0, 30)}"——这是一个真问题吗？科学家们真的在思考它吗？它为什么重要？小朋友可以从身边开始：观察、动手、提问、讨论。即使你找不到答案，你也已经走在解答的路上了。`;
-
-  // 推断 status/difficulty
-  const difficulty = hasMath || hasConsciousness || hasAI ? 4 : 3;
-  const reward = difficulty === 5 ? 3000 : difficulty === 4 ? 1500 : 800;
-
-  // 推断参与方式
-  const participate = [{ type: 'discuss', label: '想法/讨论', desc: '在社区分享你的思路和疑问' }];
-  if (hasAI || hasCS) {
-    participate.push({ type: 'code', label: '写代码/算法', desc: '用 Python/JS 实现一个简化版' });
-    participate.push({ type: 'experiment', label: '动手实验', desc: '用现有 API 做小实验' });
-  } else if (hasMath) {
-    participate.push({ type: 'solve', label: '尝试求解/证明', desc: '用数学语言严格化' });
-    participate.push({ type: 'survey', label: '文献综述', desc: '找相关论文并总结' });
-  } else if (hasClimate) {
-    participate.push({ type: 'data', label: '数据收集/标注', desc: '收集环境数据' });
-    participate.push({ type: 'community', label: '社区/组织', desc: '参与本地环保活动' });
-  } else if (hasHealth) {
-    participate.push({ type: 'essay', label: '写文章/论文', desc: '写一篇综述笔记' });
-    participate.push({ type: 'survey', label: '文献综述', desc: '读相关医学论文' });
-  } else if (hasConsciousness) {
-    participate.push({ type: 'discuss', label: '想法/讨论', desc: '在论坛参与辩论' });
-    participate.push({ type: 'essay', label: '写文章/论文', desc: '写下你的意识观点' });
-  } else {
-    participate.push({ type: 'survey', label: '文献综述', desc: '找相关资料' });
-    participate.push({ type: 'essay', label: '写文章/论文', desc: '写一篇思考笔记' });
-  }
-  if (extra) participate.push({ type: 'discuss', label: '基于你的提示', desc: extra.slice(0, 80) });
-
-  // 推断 tags
-  const tags = [catName, '用户提交', 'AI生成'];
-  if (hasAI) tags.push('AI');
-  if (hasConsciousness) tags.push('意识');
-  if (hasClimate) tags.push('气候');
-  if (hasHealth) tags.push('健康');
-  if (hasMath) tags.push('数学');
-
-  return {
-    problem: {
-      title: idea.length > 50 ? idea.slice(0, 50) + '…' : idea,
-      titleEn,
-      year: new Date().getFullYear(),
-      proposer: user?.username || '—',
-      difficulty,
-      reward,
-      status: 'open',
-      summary: idea,
-      kid,
-      formal: `对"${idea}"做严格的 ${catName} 形式化。`,
-      whyHard: '这是一个用户提交的问题，暂无公认解答路径。需要跨学科协作。',
-      aiPrompt: `你是一位 ${catName} 专家。详细分析"${idea}"，向 12 岁小朋友解释，列出 3 个可尝试的研究方向。`,
-      tags,
-      videoUrl: '',
-      videoTitle: '',
-      videoChannel: '',
-      participate
-    },
-    source: 'local_heuristic',
-    model: 'heuristic',
-    message: '已用本地启发式生成（无后端 LLM）。请仔细审核和编辑后提交。'
-  };
-}
-
 // =============== 公开 API ===============
 function getToken() { return localStorage.getItem('hpw_token'); }
 function setToken(t) { if (t) localStorage.setItem('hpw_token', t); else localStorage.removeItem('hpw_token'); }
@@ -709,7 +613,6 @@ function localRoute(path, opts = {}) {
     '/chain/transactions': 'transactions',
     '/ai/solve': 'solve',
     '/ai/evaluate': 'evaluate',
-    '/ai/contribute': 'contribute',
     '/health': 'health'
   };
 
@@ -736,7 +639,6 @@ function localRoute(path, opts = {}) {
     validate: () => localImpl.validate(),
     solve: () => localImpl.solve(body),
     evaluate: () => localImpl.evaluate(body),
-    contribute: () => localImpl.contribute(body),
     me: () => localImpl.me(),
     registerUser: () => localImpl.register(body),
     loginUser: () => localImpl.login(body),
@@ -825,12 +727,6 @@ export const api = {
   validate: () => request('/chain/validate'),
   solve: (problemId, userInput) => request('/ai/solve', { method: 'POST', body: { problem_id: problemId, user_input: userInput } }),
   evaluate: (problemId, content) => request('/ai/evaluate', { method: 'POST', body: { problem_id: problemId, content } }),
-
-  // 用户贡献问题
-  contributeProblem: (data) => request('/ai/contribute', { method: 'POST', body: data }),
-
-  // 用户贡献问题
-  contributeProblem: (data) => request('/ai/contribute', { method: 'POST', body: data }),
 
   // 模式探测
   isLocalMode: () => !backendAvailable,

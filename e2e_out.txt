@@ -6,7 +6,6 @@
 HardProblems
 .world
 硬问题
-提交问题
 排行榜
 区块链
 201 题
@@ -58,7 +57,9 @@ Riemann's Prime Numbers — 3Blue1Brown
 
 💡 不确定怎么做？直接 问 AI，或在 排行榜 找合作者。
 🧒
-小朋友版
+小朋友版解释
+
+想
    API test: { status: 200 }
 
 === Test Results ===
@@ -67,17 +68,11 @@ Riemann's Prime Numbers — 3Blue1Brown
 ✅ Problem detail opened: 黎曼猜想
 ✅ Video section visible
 ✅ Participate section visible
-✅ Contribute page loaded: ✍️ 提交一个新问题
-✅ Category math selected
-✅ AI expand button clicked
-✅ AI generated form visible
 ✅ English language works
 ✅ Chain page works: ⛓ Blockchain explorer
 ✅ Leaderboard works: 🏆 Leaderboard
 
 === Browser Errors ===
-   requestfailed: https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap - net::ERR_CONNECTION_CLOSED
-   console.error: Failed to load resource: net::ERR_CONNECTION_CLOSED
    requestfailed: https://www.youtube.com/embed/zlm1axtsNIY - net::ERR_ABORTED
 
-12/12 passed
+8/8 passed

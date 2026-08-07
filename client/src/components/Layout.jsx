@@ -17,7 +17,6 @@ export default function Layout() {
   // NAV 随语言变化重新计算
   const NAV = [
     { to: '/problems', label: t('nav.problems') },
-    { to: '/contribute', label: t('nav.contribute') || '+ 提交问题' },
     { to: '/leaderboard', label: t('nav.leaderboard') },
     { to: '/chain', label: t('nav.chain') }
   ];

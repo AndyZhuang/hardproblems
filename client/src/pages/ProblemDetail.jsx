@@ -323,16 +323,27 @@ export default function ProblemDetail() {
             <p className="text-xs text-slate-500 mt-2">所有积分 5 秒内自动上链，永久可查。</p>
           </div>
 
-          {/* 推荐类似问题给社区 */}
+          {/* 分享给朋友 / 社区 */}
           <div className="card bg-gradient-to-br from-violet-500/10 to-fuchsia-500/5 border-violet-500/20">
-            <h3 className="text-sm font-bold text-violet-200 mb-2">🌟 你想推荐一个类似问题？</h3>
+            <h3 className="text-sm font-bold text-violet-200 mb-2">🌟 分享这道硬问题</h3>
             <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-              如果你知道一个相关的硬问题（无论是这个问题的变种、姊妹问题，还是完全不同的挑战），
-              可以用 AI 一键扩展 + 审核 + 提交到网站。
+              如果你喜欢这道问题，把它分享给朋友、同学、同事——
+              也许他们能提出新角度，或者一起组队来解答。
             </p>
-            <Link to={`/contribute?category=${problem.category}`} className="block text-center py-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-200 text-xs font-medium transition-colors">
-              ✍️ 提交一个新问题 →
-            </Link>
+            <button
+              onClick={() => {
+                const url = window.location.href;
+                if (navigator.share) {
+                  navigator.share({ title: problem.title, text: problem.summary, url });
+                } else {
+                  navigator.clipboard.writeText(url);
+                  alert('已复制链接到剪贴板！');
+                }
+              }}
+              className="w-full py-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-200 text-xs font-medium transition-colors"
+            >
+              🔗 分享这道问题
+            </button>
           </div>
         </div>
       </div>
