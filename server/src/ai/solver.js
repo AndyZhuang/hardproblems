@@ -84,8 +84,12 @@ export function buildRAGContext(problemId) {
       id: p.id, title: p.title, titleEn: p.titleEn,
       category: p.category, year: p.year, status: p.status,
       tags: p.tags || [], reward: p.reward,
-      kid: p.kid, formal: p.formal, whyHard: p.whyHard,
-      aiPrompt: p.aiPrompt, summary: p.summary
+      // 默认用中文；en-US 时用英文版（如果存在）
+      kid: p.kid, kidEn: p.kidEn,
+      formal: p.formal, formalEn: p.formalEn,
+      whyHard: p.whyHard, whyHardEn: p.whyHardEn,
+      aiPrompt: p.aiPrompt, aiPromptEn: p.aiPromptEn,
+      summary: p.summary, summaryEn: p.summaryEn
     },
     related: related.map(r => ({
       id: r.id, title: r.title, titleEn: r.titleEn,
@@ -159,6 +163,15 @@ export async function chatProblem({ problemId, messages = [], model = DEFAULT_MO
 
 function buildChatSystemPrompt(ctx, lang) {
   const p = ctx.problem;
+  // 按语言选择内容（en-US 优先用 *En 字段）
+  const useEn = lang === 'en-US';
+  const title = useEn ? p.titleEn : p.title;
+  const summary = (useEn && p.summaryEn) || p.summary;
+  const kid = (useEn && p.kidEn) || p.kid;
+  const formal = (useEn && p.formalEn) || p.formal;
+  const whyHard = (useEn && p.whyHardEn) || p.whyHard;
+  const aiPrompt = (useEn && p.aiPromptEn) || p.aiPrompt || 'Please analyze this problem in depth.';
+
   const relatedList = ctx.related.length
     ? ctx.related.map((r, i) => `  ${i + 1}. ${r.title} (${r.titleEn}) — ${r.formal.slice(0, 100)}`).join('\n')
     : '  (none)';
@@ -168,13 +181,13 @@ function buildChatSystemPrompt(ctx, lang) {
   return `You are a world-class research mentor and popular-science author. Your task is to help users understand hard problems through multi-turn dialogue.
 
 # Current problem
-- Title: ${p.title} (${p.titleEn})
+- Title: ${title}
 - Category: ${p.category} | Year: ${p.year} | Status: ${p.status}
-- One-liner: ${p.summary}
-- Kid-friendly: ${p.kid}
-- Formal: ${p.formal}
-- Why hard: ${p.whyHard}
-- AI prompt: ${p.aiPrompt || 'Please analyze this problem in depth.'}
+- One-liner: ${summary}
+- Kid-friendly: ${kid}
+- Formal: ${formal}
+- Why hard: ${whyHard}
+- AI prompt: ${aiPrompt}
 
 # Related problems (for reference)
 ${relatedList}

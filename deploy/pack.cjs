@@ -10,7 +10,7 @@ const RELEASES = path.join(ROOT, 'releases');
 if (!fs.existsSync(RELEASES)) fs.mkdirSync(RELEASES, { recursive: true });
 
 const ts = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
-const VERSION = process.env.VERSION || '1.3.0';
+const VERSION = process.env.VERSION || '1.3.1';
 const outZip = path.join(RELEASES, `hardproblems-v${VERSION}-source-${ts}.zip`);
 
 const excludes = [

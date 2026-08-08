@@ -165,9 +165,15 @@ export default function ProblemDetail() {
           <span className="badge bg-violet-500/15 text-violet-300">{problem.category}</span>
           <span className="text-xs text-slate-500 font-mono ml-auto">{problem.year} · {problem.proposer || '—'}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-display font-extrabold leading-tight">{problem.title}</h1>
-        <div className="text-slate-500 font-mono mt-1">{problem.titleEn}</div>
-        <p className="text-lg text-slate-300 mt-4 leading-relaxed">{problem.summary}</p>
+        <h1 className="text-3xl sm:text-4xl font-display font-extrabold leading-tight">
+          {lang === 'en-US' && problem.titleEn ? problem.titleEn : problem.title}
+        </h1>
+        {lang !== 'en-US' && (
+          <div className="text-slate-500 font-mono mt-1">{problem.titleEn}</div>
+        )}
+        <p className="text-lg text-slate-300 mt-4 leading-relaxed">
+          {lang === 'en-US' && problem.summaryEn ? problem.summaryEn : problem.summary}
+        </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {problem.tags.map(t => <span key={t} className="badge bg-white/5 text-slate-400">#{t}</span>)}
           <span className="ml-auto text-amber-300 font-mono">⚡ 奖励 {problem.reward} HPW</span>
@@ -231,22 +237,28 @@ export default function ProblemDetail() {
             <div className="flex items-start gap-3">
               <div className="text-3xl">🧒</div>
               <div className="flex-1">
-                <h2 className="text-lg font-display font-bold text-amber-200 mb-2">小朋友版解释</h2>
-                <p className="text-slate-200 leading-relaxed">{problem.kid}</p>
+                <h2 className="text-lg font-display font-bold text-amber-200 mb-2">{t('problem.kidExplain')}</h2>
+                <p className="text-slate-200 leading-relaxed">
+                  {lang === 'en-US' && problem.kidEn ? problem.kidEn : problem.kid}
+                </p>
               </div>
             </div>
           </div>
 
           {/* 严格陈述 */}
           <div className="card">
-            <h2 className="text-lg font-display font-bold mb-2">📐 严格陈述</h2>
-            <p className="text-slate-300 leading-relaxed whitespace-pre-line">{problem.formal}</p>
+            <h2 className="text-lg font-display font-bold mb-2">{t('problem.formalStatement')}</h2>
+            <p className="text-slate-300 leading-relaxed whitespace-pre-line">
+              {lang === 'en-US' && problem.formalEn ? problem.formalEn : problem.formal}
+            </p>
           </div>
 
           {/* 为什么难 */}
           <div className="card">
-            <h2 className="text-lg font-display font-bold mb-2">🔥 为什么这么难</h2>
-            <p className="text-slate-300 leading-relaxed whitespace-pre-line">{problem.whyHard}</p>
+            <h2 className="text-lg font-display font-bold mb-2">🔥 {t('problem.whyHard')}</h2>
+            <p className="text-slate-300 leading-relaxed whitespace-pre-line">
+              {lang === 'en-US' && problem.whyHardEn ? problem.whyHardEn : problem.whyHard}
+            </p>
           </div>
 
           {/* AI 多轮对话 */}

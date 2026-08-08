@@ -91,7 +91,9 @@ export function searchProblems(query) {
     p.title.toLowerCase().includes(q) ||
     p.titleEn.toLowerCase().includes(q) ||
     p.summary.toLowerCase().includes(q) ||
+    (p.summaryEn && p.summaryEn.toLowerCase().includes(q)) ||
     p.kid.toLowerCase().includes(q) ||
+    (p.kidEn && p.kidEn.toLowerCase().includes(q)) ||
     p.tags.some(t => t.toLowerCase().includes(q))
   );
 }
@@ -140,8 +142,13 @@ def js_value(v):
 def problem_to_js(p):
     parts = []
     for key in ['id', 'category', 'title', 'titleEn', 'year', 'proposer',
-                'difficulty', 'reward', 'status', 'summary', 'kid', 'formal',
-                'whyHard', 'aiPrompt', 'tags', 'videoUrl', 'videoTitle',
+                'difficulty', 'reward', 'status',
+                'summary', 'summaryEn',
+                'kid', 'kidEn',
+                'formal', 'formalEn',
+                'whyHard', 'whyHardEn',
+                'aiPrompt', 'aiPromptEn',
+                'tags', 'videoUrl', 'videoTitle',
                 'videoChannel', 'participate']:
         val = p.get(key)
         if val is None or val == '':

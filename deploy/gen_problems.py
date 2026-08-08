@@ -99,7 +99,12 @@ add(
     participate=part(('solve','尝试证明所有非平凡零点在临界线上'),
                   ('code','用 Python/SageMath 数值计算前 10¹² 个零点验证'),
                   ('survey','阅读 Bombieri 的零点评述'),
-                  ('discuss','在 MathOverflow 跟踪最新讨论'))
+                  ('discuss','在 MathOverflow 跟踪最新讨论')),
+    summaryEn='Does the distribution of prime numbers have a perfect mathematical explanation?',
+    kidEn="Imagine you have infinitely many jars of candy, each jar holding a different number of candies. The 'prime' jars are special: 2, 3, 5, 7, 11... they can only be split evenly by 1 and themselves. Mathematicians believe these jars follow a hidden pattern. The Riemann Hypothesis is about writing that hidden pattern as a clean math formula. Get it right and the Clay Foundation gives you $1 million!",
+    formalEn='All non-trivial zeros of the Riemann zeta function ζ(s) lie on the critical line Re(s) = 1/2 in the complex plane.',
+    whyHardEn='It is entangled with almost every important conjecture in number theory; in 165 years no one has proven it, and no one has produced a counterexample.',
+    aiPromptEn='You are a friendly math teacher. Explain the Riemann Hypothesis to a 12-year-old, then give a rigorous statement, current research state, key approaches, and key references.',
 )
 
 add(
@@ -116,7 +121,12 @@ add(
     participate=part(('solve','尝试证明 P≠NP 或 P=NP'),
                   ('code','用 SAT 求解器跑基准测试'),
                   ('survey','阅读 Aaronson 的 P vs NP 综述'),
-                  ('essay','写一篇面向中学生的科普'))
+                  ('essay','写一篇面向中学生的科普')),
+    summaryEn='Can every problem whose solution can be quickly verified also be quickly solved?',
+    kidEn='Some puzzles are easy to check answers for but hard to solve. For example, a Sudoku: once you see a solution, you can quickly verify it is correct, but finding it took effort. P vs NP asks: does this always happen, or is there a faster way?',
+    formalEn='Does P (problems solvable in polynomial time) equal NP (problems whose solutions are verifiable in polynomial time)?',
+    whyHardEn='It is the central question in theoretical computer science. Resolving it would unlock (or prove impossible) thousands of algorithms in optimization, cryptography, AI, and biology.',
+    aiPromptEn='Explain P vs NP to a 12-year-old. Cover: what each class means, why it matters, the main approaches (relativization, natural proofs, algebrization), and the most recent breakthrough attempts.',
 )
 
 add(
@@ -133,7 +143,12 @@ add(
     participate=part(('solve','用格点规范理论证明存在 Δ>0'),
                   ('code','用 Python 实现 Wilson 网格'),
                   ('model','建立简化的 1+1 维模型'),
-                  ('survey','读 Witten 论文'))
+                  ('survey','读 Witten 论文')),
+    summaryEn='Why can we describe the strong force with math, but cannot rigorously prove it exists?',
+    kidEn='There are 4 fundamental forces: gravity, electricity, weak force, and strong force. The strong force is what holds the nucleus together. We have a beautiful theory for it (Yang-Mills) that works perfectly, but nobody has been able to mathematically prove that the theory actually has the right answers. Strange!',
+    formalEn='Prove that for any compact simple gauge group G, a non-trivial Yang-Mills theory on R⁴ exists and has a mass gap Δ > 0.',
+    whyHardEn='It requires bridging the gap between physics intuition (which works) and rigorous mathematics (which has not yet been built). Related to the four-dimensional Yang-Mills existence and mass gap problem.',
+    aiPromptEn='Explain the Yang-Mills existence and mass gap to a 12-year-old. Cover: what is gauge theory, why mass gap matters, the Hodge structure analogy, and what progress has been made.',
 )
 
 add(
@@ -150,7 +165,12 @@ add(
     participate=part(('solve','证明光滑性或构造 blow-up 解'),
                   ('code','用 Lattice Boltzmann 模拟'),
                   ('model','建立简化的低维模型'),
-                  ('experiment','用 PIV 测量真实流体'))
+                  ('experiment','用 PIV 测量真实流体')),
+    summaryEn='Can we prove that fluid flow never spontaneously goes haywire?',
+    kidEn="When you turn on a faucet, water flows smoothly. When you turn it up more, it gets turbulent. The Navier-Stokes equations describe this fluid flow. We use them to design planes, predict weather, and model oceans. But mathematically, we have not proven that the equations always have nice solutions and never 'explode' to infinity.",
+    formalEn='Prove that smooth, globally defined solutions exist for the Navier-Stokes equations in R³ for all time, given smooth initial conditions.',
+    whyHardEn='It involves subtle questions about energy conservation and the regularity of fluid solutions, and the $1M prize has eluded mathematicians for 25+ years.',
+    aiPromptEn='Explain the Navier-Stokes regularity problem to a 12-year-old. Cover: what the equations are, why turbulence is hard, current approaches (energy methods, blow-up candidates), and implications for weather/climate modeling.',
 )
 
 add(
@@ -167,7 +187,12 @@ add(
     participate=part(('solve','用代数几何语言证明或反驳'),
                   ('survey','读 Voisin 的 Hodge 综述'),
                   ('code','用 SageMath/Macaulay2 计算例子'),
-                  ('discuss','在 MathOverflow 提问'))
+                  ('discuss','在 MathOverflow 提问')),
+    summaryEn='Are all geometric shapes decomposable into simpler building blocks?',
+    kidEn="Imagine you have a beautiful donut (torus). Can you always cut it into smaller pieces that are 'algebraic shapes'? The Hodge conjecture says yes, but no one has proven it for all shapes.",
+    formalEn='On a smooth complex projective variety, every Hodge class is a rational linear combination of the cohomology classes of complex algebraic subvarieties.',
+    whyHardEn='It bridges algebraic geometry, topology, and complex analysis. The statement is elegant, but the proof requires entirely new techniques that have not yet been developed.',
+    aiPromptEn='Explain the Hodge conjecture to a 12-year-old. Use the torus/donut analogy. Cover: algebraic cycles, cohomology, why this matters for math unification.',
 )
 
 add(
@@ -184,7 +209,12 @@ add(
     participate=part(('solve','对特定 rank=1 曲线证明 BSD'),
                   ('code','用 PARI/GP 计算 L 函数的低阶项'),
                   ('survey','读 Gross 的导论'),
-                  ('essay','写一篇大学本科水平的介绍'))
+                  ('essay','写一篇大学本科水平的介绍')),
+    summaryEn='How many rational points does an elliptic curve have?',
+    kidEn="An elliptic curve is a special donut shape with a beautiful structure. The Birch and Swinnerton-Dyer conjecture predicts exactly how many 'rational points' (points with integer coordinates) it has. The rank determines this count, but proving the conjecture is incredibly hard.",
+    formalEn='For an elliptic curve E over Q, the rank of the Mordell-Weil group E(Q) equals the order of vanishing of the L-function L(E, s) at s = 1.',
+    whyHardEn='It connects number theory to analysis and modular forms. Partial progress by Gross-Zagier and Kolyvag shows it is true at least sometimes, but the general case remains open.',
+    aiPromptEn='Explain the BSD conjecture to a 12-year-old. Use the rational point analogy. Cover: L-functions, ranks, what we know from the Gross-Zagier theorem, and the 2021 lakhshme work.',
 )
 
 add(
@@ -201,7 +231,12 @@ add(
     participate=part(('solve','尝试缩小到 2 的差距'),
                   ('code','写多精度素数筛法，找更大的孪生素数对'),
                   ('essay','写张益唐故事'),
-                  ('kid-project','和小朋友一起找孪生素数'))
+                  ('kid-project','和小朋友一起找孪生素数')),
+    summaryEn='Are there infinitely many pairs of prime numbers that differ by 2?',
+    kidEn='Twin primes are pairs of primes that differ by 2, like (3,5), (5,7), (11,13), (17,19). Are there infinitely many such pairs? Most mathematicians think yes, but no one has proven it yet.',
+    formalEn='Are there infinitely many pairs of primes (p, p+2)?',
+    whyHardEn="It is a special case of the prime tuples conjecture. The 2013 Zhang theorem and Maynard's later work showed the gap between consecutive primes is bounded — a huge breakthrough — but proving infinitely many gaps of exactly 2 is still open.",
+    aiPromptEn='Explain twin primes to a 12-year-old. Cover: what they are, the Zhang/Maynard bounded gaps breakthrough, and the Hardy-Littlewood prime tuples conjecture.',
 )
 
 add(
@@ -218,7 +253,12 @@ add(
     participate=part(('solve','尝试证明陈氏定理"1+2"'),
                   ('code','写并行筛法验证到 10²⁰'),
                   ('kid-project','和 10 岁孩子拆偶数为素数和'),
-                  ('essay','讲陈景润的人生故事'))
+                  ('essay','讲陈景润的人生故事')),
+    summaryEn='Can every even number greater than 2 be written as the sum of two primes?',
+    kidEn='Take any even number: 4 = 2+2, 6 = 3+3, 8 = 3+5, 10 = 5+5, 10 = 3+7. Can every even number be written as the sum of two primes? Goldbach said yes in 1742, but no one has proven it.',
+    formalEn='For every even integer n > 2, there exist primes p and q such that n = p + q.',
+    whyHardEn='It is an exceptionally simple statement to write down but has resisted all attempts at proof for 280+ years. The weak Goldbach conjecture (every odd number > 5 is sum of 3 primes) was proven by Helfgott in 2013.',
+    aiPromptEn='Explain the Goldbach conjecture to a 12-year-old. Cover: how to verify it for small numbers, why it is hard, the weak Goldbach proof by Helfgott, and what computational verification tells us.',
 )
 
 add(
@@ -236,7 +276,12 @@ add(
                   ('code','用 GPU 并行验证到 10²⁰'),
                   ('visualize','画序列轨道图'),
                   ('kid-project','让小朋友跑小数字看轨迹'),
-                  ('essay','写为什么这个简单规则这么难'))
+                  ('essay','写为什么这个简单规则这么难')),
+    summaryEn="Does Collatz's sequence always reach 1?",
+    kidEn="Take any number. If it's even, divide by 2. If it's odd, multiply by 3 and add 1. Keep going. Does it always reach 1? Tested up to 10²⁰ and yes, but no proof.",
+    formalEn='For the function f(n) = n/2 if n is even, 3n+1 if n is odd, does iteration of f starting from any positive integer n eventually reach 1?',
+    whyHardEn='It is one of the simplest-to-state yet hardest-to-prove problems in mathematics. The dynamics is chaotic, and partial results (e.g., Tao 2019) show most orbits converge, but the general case is still wide open.',
+    aiPromptEn='Explain the Collatz conjecture to a 12-year-old. Cover: the rules, the stopping time distribution, why it is hard (chaos, irregular behavior), and recent partial results.',
 )
 
 # --- 新增数学问题 (15+ 个) ---
@@ -288,7 +333,12 @@ add(
     participate=part(('solve','找新解或证明有限性'),
                   ('code','穷举搜索 100 位以内解'),
                   ('survey','读 Darmon-Granville 综述'),
-                  ('essay','写已知 10 个解的故事'))
+                  ('essay','写已知 10 个解的故事')),
+    summaryEn='Are there any solutions to xᵃ + yᵇ = zᶜ with 1/a + 1/b + 1/c < 1 beyond the known ones?',
+    kidEn="Fermat's Last Theorem says no solutions to x³ + y³ = z³. But what about 2³ + 3² = 1 + 9 = 17, but 17 is not a perfect cube. The Catalan conjecture (now Mihailescu theorem) says 2³ + 1³ = 3² is the only such solution.",
+    formalEn='Are there any other solutions to xᵃ + yᵇ = zᶜ with x, y, z, a, b, c > 0 and 1/a + 1/b + 1/c < 1 besides 2³ + 1³ = 3²?',
+    whyHardEn="It is a generalization of Fermat's Last Theorem. Mihailescu proved the special case 1/a + 1/b + 1/c = 1 (the Catalan/Mihailescu theorem), but the general inequality case is still open.",
+    aiPromptEn='Explain the Fermat-Catalan conjecture to a 12-year-old. Cover: Fermat last theorem, the Catalan special case, and what 1/a + 1/b + 1/c < 1 means.',
 )
 
 add(

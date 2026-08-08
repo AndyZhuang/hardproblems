@@ -5,6 +5,70 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-08-08
+
+### 🌐 D 阶段收尾 — 多语言问题内容（Top 10 + 基础设施）
+
+**给最知名的 10 道题加了完整英文翻译**（summary/kid/formal/whyHard/aiPrompt 各字段），其他 191 题在英文 UI 下自动 fallback 到中文。
+
+### Added - 10 题完整英文翻译
+
+| 题目 | 英文标题 | 类别 |
+|---|---|---|
+| `millennium-riemann` | Riemann Hypothesis | Math |
+| `millennium-pvsnp` | P versus NP | CS/Math |
+| `millennium-yangmills` | Yang-Mills Existence & Mass Gap | Physics |
+| `millennium-navierstokes` | Navier-Stokes Regularity | Math |
+| `millennium-hodge` | Hodge Conjecture | Math |
+| `millennium-bsd` | Birch & Swinnerton-Dyer | Math |
+| `twin-primes` | Twin Prime Conjecture | Math |
+| `goldbach` | Goldbach's Conjecture | Math |
+| `collatz` | Collatz Conjecture (3n+1) | Math |
+| `fermat-catalan` | Fermat-Catalan Conjecture | Math |
+
+### Changed - Schema 扩展（向后兼容）
+
+每个问题增加 5 个可选字段：
+- `summaryEn` / `kidEn` / `formalEn` / `whyHardEn` / `aiPromptEn`
+
+**前端行为** (`ProblemDetail.jsx`):
+- 切到 `en-US` 时，UI 优先用 `*En` 字段
+- 没有 `*En` 的题自动 fallback 到中文 + 顶部显示英文 title
+- 搜索框同时支持中文 + 英文（`searchProblems` 已加 `*En` 匹配）
+
+**AI 行为** (`server/src/ai/solver.js`):
+- `buildRAGContext` 返回所有字段（中文 + 英文）
+- `buildChatSystemPrompt(lang='en-US')` 优先用 `*En` 字段构造 system prompt
+- LLM 真实可用时，按用户语言回答（用 `*En` 字段的英文）
+
+**生成器** (`deploy/gen_problems.py` + `gen_problems_js.py`):
+- 字段列表加入 `summaryEn`, `kidEn`, `formalEn`, `whyHardEn`, `aiPromptEn`
+- 搜索过滤加入 `summaryEn` / `kidEn`
+
+### Tests
+
+- `test_english_content.cjs` (新): 12/12 passed (3 题 × 4 断言：标题中英 + kid/formal 英文)
+- `e2e_v1.2.cjs`: 8/8 passed (回归)
+- `test_chat.cjs`: 14/14 passed (回归)
+- `test_i18n_chat.cjs`: 6/6 passed (回归)
+- HPW 合约: 17/17 passed (回归)
+
+### Bundle
+
+- Main: 427 KB JS + 36 KB CSS (gzip 166 + 7)
+- WalletButton chunk: 300 KB (按需加载)
+- 增加 ~10KB 给英文字段（每个 add 块 +5 字段，201 题 +9KB 平均）
+
+### Deploy
+
+- mcode: https://...mcode.cn
+- ZIP: `releases/hardproblems-v1.3.1-source-20260808043156.zip` (982 KB, 152 files)
+- Top 10 problems 已英文化；其余 191 题用户切到 en-US 仍看中文（可后续批量补）
+
+### TODO
+
+批量翻译剩余 191 题的英文（需要 LLM API 可用，或者人工逐题处理）
+
 ## [1.3.0] - 2026-08-08
 
 ### 🎉 A + C + D 三方向大版本
