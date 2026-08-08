@@ -92,3 +92,11 @@ check_*.js
 # ===== Python =====
 deploy/__pycache__/
 *.pyc
+
+# ===== Hardhat / Solidity =====
+contracts/artifacts/
+contracts/cache/
+contracts/typechain/
+contracts/deployments/
+contracts/coverage/
+contracts/coverage.json

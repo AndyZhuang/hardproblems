@@ -130,6 +130,13 @@ app.get('/api/version', (_req, res) => {
   res.json({ name: pkg.name, version: pkg.version, env: config.env });
 });
 
+// HPW 链上合约状态
+app.get('/api/hpw/status', async (_req, res) => {
+  const { getHPWStatus, HPW_CONFIG } = await import('./hpw.js');
+  const status = await getHPWStatus();
+  res.json({ ...status, config: HPW_CONFIG });
+});
+
 app.use('/api/users', usersRouter);
 app.use('/api/problems', problemsRouter);
 app.use('/api/solutions', solutionsRouter);

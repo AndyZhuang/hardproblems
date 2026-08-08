@@ -135,7 +135,7 @@ router.get('/:username', (req, res) => {
 });
 
 router.patch('/me', requireAuth, (req, res) => {
-  const { bio, avatar } = req.body || {};
+  const { bio, avatar, wallet_address } = req.body || {};
   if (bio !== undefined) {
     const e = validateBio(bio);
     if (e) return res.status(400).json({ error: e });
@@ -145,9 +145,15 @@ router.patch('/me', requireAuth, (req, res) => {
       return res.status(400).json({ error: '头像 URL 不合法' });
     }
   }
+  if (wallet_address !== undefined) {
+    if (wallet_address !== null && !/^0x[0-9a-fA-F]{40}$/.test(wallet_address)) {
+      return res.status(400).json({ error: '钱包地址不合法（应为 0x 开头的 42 字符）' });
+    }
+  }
   const patch = {};
   if (bio !== undefined) patch.bio = bio;
   if (avatar !== undefined) patch.avatar = avatar;
+  if (wallet_address !== undefined) patch.wallet_address = wallet_address;
   Users.update(req.user.id, patch);
   res.json({ user: publicUser(Users.byId(req.user.id)) });
 });

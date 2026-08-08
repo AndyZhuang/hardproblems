@@ -1,10 +1,13 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { api } from '../lib/api.js';
 import PWABanner from './PWABanner.jsx';
 import LangSwitcher from './LangSwitcher.jsx';
 import { useI18n, t } from '../lib/i18n.js';
+
+// 钱包按钮 + viem 按需加载（懒加载 chunk，约 300KB）
+const WalletButton = lazy(() => import('./WalletButton.jsx'));
 
 export default function Layout() {
   const { user, loading, logout } = useAuth();
@@ -59,6 +62,9 @@ export default function Layout() {
                 </div>
               )}
               <LangSwitcher />
+              <Suspense fallback={null}>
+                <WalletButton />
+              </Suspense>
               {loading ? null : user ? (
                 <div className="flex items-center gap-2">
                   <Link to={`/u/${user.username}`} className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5">

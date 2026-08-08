@@ -7,12 +7,19 @@
 import { useEffect, useState, useCallback } from 'react';
 import zhCN from './locales/zh-CN.js';
 import enUS from './locales/en-US.js';
+import esES from './locales/es-ES.js';
+import jaJP from './locales/ja-JP.js';
 
 const STORAGE_KEY = 'hpw.lang';
-const SUPPORTED = ['zh-CN', 'en-US'];
+const SUPPORTED = ['zh-CN', 'en-US', 'es-ES', 'ja-JP'];
 const DEFAULT = 'zh-CN';
 
-const DICTS = { 'zh-CN': zhCN, 'en-US': enUS };
+const DICTS = {
+  'zh-CN': zhCN,
+  'en-US': enUS,
+  'es-ES': esES,
+  'ja-JP': jaJP,
+};
 
 function detectInitialLang() {
   if (typeof window === 'undefined') return DEFAULT;
@@ -20,6 +27,8 @@ function detectInitialLang() {
   if (saved && SUPPORTED.includes(saved)) return saved;
   const nav = (window.navigator.language || 'en').toLowerCase();
   if (nav.startsWith('zh')) return 'zh-CN';
+  if (nav.startsWith('es')) return 'es-ES';
+  if (nav.startsWith('ja')) return 'ja-JP';
   return 'en-US';
 }
 

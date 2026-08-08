@@ -5,6 +5,112 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-08-08
+
+### 🎉 A + C + D 三方向大版本
+
+**A: 智能 AI 解题 + 评估**
+**C: HPW 真链集成（Base L2）**
+**D: 4 语言国际化（zh-CN / en-US / es-ES / ja-JP）**
+
+### Added - A: AI 多轮对话 + 严格 5 维 Rubric 评估
+
+**多轮对话** (`POST /ai/chat`):
+- 完整对话历史保持，支持追问/反驱/要求举例/要求简化
+- 每轮显示「第 N 轮」标签 + 来源 (LLM / 启发式回退)
+- RAG 上下文注入：自动拉取问题的 kid/formal/whyHard/aiPrompt + 3 个相关问题作为参考
+- 离线模式 (localAIchat) 完整可用，无需后端
+
+**5 维 Rubric 评估** (`POST /ai/evaluate`):
+- 5 个独立维度，每维 0-20 分：accuracy / depth / originality / rigor / clarity
+- 总分 0-100，附 strengths / weaknesses / verdict
+- 启发式回退版按相同维度打分
+
+**前端 UI** (ProblemDetail.jsx):
+- 聊天气泡布局：用户（右）/ AI（左）
+- 4 个快捷问题按钮（"用 8 岁能懂的话解释"等）
+- Ctrl/Cmd+Enter 发送
+- "📋 复制最后一轮到提交框" 快捷操作
+- 5 维评估明细卡片：进度条 + 分值 + 优势/不足
+- "📊 5 维评估" 按钮（提交前预览分数）
+
+### Added - C: HPW 真链集成（Base Sepolia）
+
+**HPW ERC-20 合约** (`contracts/src/HPW.sol`):
+- 标准 OpenZeppelin v5 ERC-20
+- Cap: 1B HPW (1,000,000,000 * 10^18)
+- `reward(to, amount, reason)` 单笔 mint
+- `rewardBatch(recipients[], amounts[], reason)` 批量 mint
+- `setRewardMinter()` owner 切换 minter
+- `rescueTokens()` owner 提取误转 ERC20
+- Reward / RewardMinterUpdated 事件
+
+**部署基础设施**:
+- Hardhat 配置: Base Sepolia (testnet) + Base mainnet + 本地 hardhat 网络
+- `contracts/scripts/deploy.cjs` 部署 + Basescan 验证
+- `contracts/indexer.cjs` 监听链上事件同步到 `data/chain/indexed.json`
+- 17 单元测试覆盖部署 / reward / cap / batch / setRewardMinter / 标准 ERC20
+
+**前端 MetaMask 集成**:
+- `useWallet` hook: Viem 2.x + EIP-1193 wallet API
+- `WalletButton` 组件: 4 状态 (无 MetaMask / 未连接 / 已连接 / 链不对)
+- 按需懒加载 (viem 300KB 单独 chunk)
+- 自动保存 wallet 地址到 user profile
+- HPW 余额实时显示
+
+**服务端链上奖励** (`server/src/hpw.js`):
+- 检测 HPW_ADDRESS + REWARD_MINTER_KEY 环境变量
+- 提交解答时自动触发链上 mint
+- graceful fallback: 未配置时仅链下记账
+- `GET /api/hpw/status` 端点暴露合约状态
+
+### Added - D: 国际化（4 语言）
+
+**支持语言**:
+- 🇨🇳 zh-CN (简体中文，默认)
+- 🇺🇸 en-US (English)
+- 🇪🇸 es-ES (Español) - **新**
+- 🇯🇵 ja-JP (日本語) - **新**
+
+**自动检测**:
+- navigator.language → 优先匹配 (zh → zh-CN, es → es-ES, ja → ja-JP, 其他 → en-US)
+- localStorage 记忆用户上次选择
+
+**AI 跟语言** (D3):
+- `chatProblem({ problemId, messages, lang })` 接受 lang 参数
+- 系统 prompt 包含 `请用中文回答` / `Please respond in English` 等指令
+- 4 语言完整模板 (zh-CN / en-US / es-ES / ja-JP) 用于离线启发式回退
+- 在线 LLM 也按用户语言回答
+
+### Tech
+
+- viem 2.55 (Ethereum 库，按需懒加载)
+- ethers 6.13 (Node 端用)
+- @openzeppelin/contracts 5.0
+- hardhat 2.22 + @nomicfoundation/hardhat-toolbox 5.0
+- @nomicfoundation/hardhat-toolbox 含 chai / ethers / hardhat-network-helpers
+
+### Tests
+
+- e2e_v1.2.cjs: 8/8 passed
+- test_chat.cjs: 14/14 passed (多轮对话 + 5 维评估)
+- test_i18n_chat.cjs: 6/6 passed (4 语言 AI 聊天)
+- test_register_browser.cjs: passed (TDZ 修复持续有效)
+- HPW 合约测试: 17/17 passed
+
+### Bundle
+
+- Main: 418 KB JS + 36 KB CSS (gzip 162 KB + 7 KB)
+- WalletButton (lazy): 300 KB (gzip 92 KB)
+- HPW ABI: 1 KB
+
+### Deploy
+
+- mcode: https://space.mcode.cn (deploy 后)
+- ZIP: `releases/hardproblems-v1.3.0-source-<ts>.zip`
+- 合约测试通过 (17/17)
+- 合约实际部署到 Base Sepolia 需要 testnet ETH（文档在 `contracts/README.md`）
+
 ## [1.2.2] - 2026-08-07
 
 ### 🗑 Removed - 用户提交问题模块 (Contribute)

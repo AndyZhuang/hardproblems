@@ -5,6 +5,8 @@ import { Solutions, Votes, Users } from '../db.js';
 import { getProblemById } from '../data/problems.js';
 import { createTransaction, submitTransaction, forceMakeBlock } from '../blockchain.js';
 import { evaluateSolution } from '../ai/solver.js';
+import { rewardOnChain } from '../hpw.js';
+import { logger } from '../logger.js';
 import { requireAuth } from './users.js';
 
 const router = Router();
@@ -100,10 +102,25 @@ router.post('/', requireAuth, async (req, res) => {
 
   setTimeout(() => forceMakeBlock().catch(() => {}), 100);
 
+  // 🚀 链上 HPW 奖励：用户必须连过 MetaMask 才有 wallet_address
+  let onchainReward = null;
+  if (req.user.wallet_address && /^0x[0-9a-fA-F]{40}$/.test(req.user.wallet_address)) {
+    try {
+      onchainReward = await rewardOnChain(
+        req.user.wallet_address,
+        totalReward.toString(),
+        `solution:${problem_id}:${id.slice(0, 8)}`
+      );
+    } catch (e) {
+      logger.warn('[solutions] on-chain reward failed', { err: e.message, userId: req.user.id });
+    }
+  }
+
   res.json({
     solution: { id, problemId: problem_id, userId: req.user.id, title, content, aiAssisted: !!ai_assisted, aiModel: ai_model || evalResult.model, aiQualityScore: evalResult.score, scoreAwarded: totalReward, createdAt: now, txId: tx.id },
     evaluation: evalResult,
-    reward: totalReward
+    reward: totalReward,
+    onchainReward  // { success, txHash, source, error? }
   });
 });
 

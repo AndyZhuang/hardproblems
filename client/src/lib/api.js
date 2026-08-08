@@ -459,6 +459,16 @@ const localImpl = {
   },
   evaluate({ problem_id, content }) {
     return localAIeval(problem_id, content);
+  },
+  chat({ problem_id, messages, lang }) {
+    return Promise.resolve({
+      problemId: problem_id,
+      reply: localAIchat(problem_id, messages || [], lang),
+      model: 'heuristic',
+      source: 'fallback',
+      lang: lang || 'zh-CN',
+      turn: (messages || []).filter(m => m.role === 'user').length
+    });
   }
 };
 
@@ -493,50 +503,186 @@ function localAIsolve(problemId, userInput) {
   };
 }
 
+// =============== 5 维度启发式评估 (offline mode) ===============
 function localAIeval(problemId, content) {
   const p = getProblemById(problemId);
   if (!p) throw new Error('问题不存在');
   const text = (content || '').toLowerCase();
-  let score = 0;
   const strengths = [], weaknesses = [];
 
-  if (content.length < 50) { weaknesses.push('内容过短'); }
-  else if (content.length < 200) { score += 15; weaknesses.push('内容偏短'); }
-  else if (content.length < 800) { score += 30; }
-  else if (content.length < 2000) { score += 45; strengths.push('内容长度充分'); }
-  else { score += 50; strengths.push('内容详尽'); }
-
-  if (content.includes('## ') || content.includes('# ')) { score += 8; strengths.push('使用了 Markdown 章节'); }
-  if (content.includes('```') || content.includes('$')) { score += 5; strengths.push('包含代码或公式'); }
-  if (content.match(/\*\*[^*]+\*\*/)) { score += 3; }
-
+  // 准确性：关键词匹配
   const keywords = [
     ...p.title.toLowerCase().split(/\s+/),
     ...p.titleEn.toLowerCase().split(/\s+/),
     ...(p.tags || []).map(t => t.toLowerCase())
   ].filter(w => w.length > 2);
-  let match = 0;
-  for (const k of keywords) if (text.includes(k)) match++;
-  const ratio = keywords.length ? match / keywords.length : 0;
-  if (ratio > 0.3) { score += 15; strengths.push(`与问题高度相关（${Math.round(ratio * 100)}%）`); }
-  else if (ratio > 0.1) { score += 8; }
-  else { weaknesses.push('与问题主题相关性低'); }
+  const matchCount = keywords.filter(k => text.includes(k)).length;
+  const matchRatio = keywords.length ? matchCount / keywords.length : 0;
+  const accuracy = matchRatio > 0.5 ? 16 : matchRatio > 0.3 ? 13 : matchRatio > 0.1 ? 10 : 6;
+  if (matchRatio > 0.3) strengths.push('内容与问题高度相关');
+  else if (matchRatio < 0.1) weaknesses.push('与问题主题相关性较低');
 
-  const signals = ['因为', '所以', '但是', '然而', '例如', '假设', '证明', '实验', '理论', '模型', '方法', '思路'];
-  const sd = signals.filter(s => content.includes(s)).length;
-  if (sd >= 5) { score += 10; strengths.push('展现深入思考'); }
-  else if (sd >= 2) { score += 5; }
+  // 深度：思考连接词
+  const depthSignals = ['因为', '所以', '因此', '但是', '然而', '例如', '比如', '假设', '证明', '实验', '观察', '理论', '模型', '方法', '思路'];
+  const depthHits = depthSignals.filter(s => text.includes(s)).length;
+  let depth = depthHits >= 6 ? 14 : depthHits >= 3 ? 11 : depthHits >= 1 ? 8 : 5;
+  if (content.length > 2000) depth += 3; else if (content.length > 800) depth += 1;
+  if (depthHits >= 5) strengths.push('展现深入思考');
+  else if (depthHits === 0) weaknesses.push('缺少逻辑连接词，深度不足');
 
-  if (/我的看法|我认为|我猜想|我的理解/i.test(content)) { score += 5; strengths.push('包含个人观点'); }
+  // 原创性
+  const origMarkers = ['我的看法', '我认为', '我猜想', '我的理解', '我的假设', '我提出', '我设计', 'i think', 'in my view'];
+  const origHits = origMarkers.filter(s => text.includes(s)).length;
+  const originality = origHits >= 2 ? 13 : origHits >= 1 ? 10 : 6;
+  if (origHits >= 1) strengths.push('包含个人观点');
 
-  score = Math.max(0, Math.min(100, score));
+  // 严谨性
+  let rigor = 5;
+  if (content.includes('## ') || content.includes('# ')) rigor += 4;
+  if (content.includes('```') || /\$\$?/.test(content)) rigor += 4;
+  if (/\*\*[^*]+\*\*/.test(content)) rigor += 2;
+  if ((content.match(/[0-9]+\./g) || []).length >= 3) rigor += 3;
+  if (content.length > 1000) rigor += 2;
+  if (/[^。.]\n/.test(content)) rigor += 2;
+  if (rigor >= 14) strengths.push('结构严谨');
+  else if (rigor < 8) weaknesses.push('结构松散');
+
+  // 表达
+  let clarity = 10;
+  if (content.length < 100) clarity = 4;
+  else if (content.length < 50) clarity = 2;
+  else {
+    if (content.length > 500) clarity += 4;
+    if (content.length > 2000) clarity += 2;
+    if (/^#+ /.test(content)) clarity += 2;
+    if (content.split('\n\n').length >= 3) clarity += 2;
+  }
+  if (clarity >= 14) strengths.push('表达清晰');
+  else if (clarity < 8) weaknesses.push('表达需要改进');
+
+  const score = Math.max(0, Math.min(100, accuracy + depth + originality + rigor + clarity));
   return {
     score,
-    reasoning: `本地启发式评估：长度(${content.length})、结构、关键词匹配(${Math.round(ratio * 100)}%)、思考深度(${sd})`,
+    dimensions: { accuracy, depth, originality, rigor, clarity },
+    reasoning: `本地启发式 5 维评估：关键词匹配 ${Math.round(matchRatio * 100)}%，深度信号 ${depthHits} 个，结构分 ${rigor}，表达分 ${clarity}`,
     strengths: strengths.length ? strengths : ['提交了内容'],
-    weaknesses: weaknesses.length ? weaknesses : ['需要真实 LLM 评估'],
-    model: 'heuristic', source: 'fallback'
+    weaknesses: weaknesses.length ? weaknesses : ['需要真实 LLM 评估来获得更准确的判断'],
+    verdict: score >= 70 ? '良好' : score >= 50 ? '及格' : '需要加强',
+    model: 'heuristic',
+    source: 'fallback'
   };
+}
+
+// =============== 离线模式：单轮 chat (用 evaluate 的启发式当回复) ===============
+function localAIchat(problemId, messages, lang = 'zh-CN') {
+  const p = getProblemById(problemId);
+  if (!p) throw new Error('问题不存在');
+  const turn = messages.filter(m => m.role === 'user').length;
+  const lastUser = [...messages].reverse().find(m => m.role === 'user')?.content || '';
+
+  // 找同 category 的 2-3 个相关问题作为"参考"
+  const related = PROBLEMS
+    .filter(x => x.id !== p.id && x.category === p.category)
+    .slice(0, 3);
+
+  const relatedText = related.length
+    ? related.map((r, i) => `  ${i + 1}. ${r.title} (${r.titleEn})`).join('\n')
+    : '  (none)';
+
+  const I18N = {
+    'zh-CN': {
+      title: `# 💬 第 ${turn} 轮 · ${p.title}`,
+      disclaimer: '> *当前 LLM 不可用，以下是基于公开资料的回复。配置 LLM API key 后将获得 AI 原创多轮对话。*',
+      h1: '## 🧒 先回到小朋友版',
+      h2: '## 📐 严格陈述',
+      h3: '## 🔥 为什么难',
+      h4: '## 🔗 相关问题（参考）',
+      h5: `## 💡 你这次问的："${lastUser.slice(0, 100)}"`,
+      intro: '这个角度很有价值。建议：',
+      tip1: `1. **先看学科综述** — 找 "${p.titleEn} survey 2024 2025 2026" 关键词的 review paper`,
+      tip2: `2. **跨学科类比** — 在 ${related[0]?.title || '相关问题'} 中能找到有用的类比`,
+      tip3: '3. **动手算/做** — 即使是理论问题也可以做数值实验验证',
+      tip4: '4. **拆子问题** — 把大问题拆成可验证的小问题',
+      h6: '## 🎯 建议下一步',
+      next1: '- 提供更多你的具体问题（数学表述/物理图像/计算数据）',
+      next2: '- 引用你熟悉的论文或教材，我可以帮你梳理',
+      next3: '- 想看一个具体子问题吗？告诉我你想深挖哪个方向',
+      footer: (turn > 3) ? `\n\n---\n\n*我们已经聊了 ${turn} 轮。如果想换个角度，可以试问：这个问题和 ${related[0]?.title || '其他相关问题'} 有何联系？*` : ''
+    },
+    'en-US': {
+      title: `# 💬 Turn ${turn} · ${p.title}`,
+      disclaimer: '> *LLM currently unavailable. Public-data-based reply. Set LLM API key for original AI conversation.*',
+      h1: '## 🧒 Kid-friendly recap',
+      h2: '## 📐 Formal statement',
+      h3: "## 🔥 Why it's hard",
+      h4: '## 🔗 Related problems (reference)',
+      h5: `## 💡 You asked: "${lastUser.slice(0, 100)}"`,
+      intro: 'Good angle. Suggestions:',
+      tip1: `1. **Read a survey** — search "${p.titleEn} survey 2024 2025 2026"`,
+      tip2: `2. **Cross-disciplinary analogy** — useful parallels in ${related[0]?.title || 'related problems'}`,
+      tip3: '3. **Compute/experiment** — even theoretical problems can be probed with numerics',
+      tip4: '4. **Decompose** — break the big problem into verifiable sub-problems',
+      h6: '## 🎯 Next steps',
+      next1: '- Provide more specifics (math, physics, data)',
+      next2: '- Cite papers/textbooks; I can organize them',
+      next3: '- Want a sub-problem? Tell me which direction to dig',
+      footer: (turn > 3) ? `\n\n---\n\n*${turn} turns in. To switch angle: how does this relate to ${related[0]?.title || 'related problems'}?*` : ''
+    },
+    'es-ES': {
+      title: `# 💬 Turno ${turn} · ${p.title}`,
+      disclaimer: '> *LLM no disponible. Respuesta basada en datos públicos.*',
+      h1: '## 🧒 Resumen para niños',
+      h2: '## 📐 Declaración formal',
+      h3: '## 🔥 Por qué es difícil',
+      h4: '## 🔗 Problemas relacionados (referencia)',
+      h5: `## 🧭 Preguntaste: "${lastUser.slice(0, 100)}"`,
+      intro: 'Buen ángulo. Sugerencias:',
+      tip1: `1. **Lee un survey** — busca "${p.titleEn} survey 2024 2025 2026"`,
+      tip2: `2. **Analogía interdisciplinaria** — paralelos en ${related[0]?.title || 'problemas relacionados'}`,
+      tip3: '3. **Computar/experimentar** — problemas teóricos se pueden sondear',
+      tip4: '4. **Descomponer** — divide en sub-problemas verificables',
+      h6: '## 🎯 Próximos pasos',
+      next1: '- Proporciona más detalles',
+      next2: '- Cita artículos que conozcas',
+      next3: '- ¿Quieres un sub-problema?',
+      footer: (turn > 3) ? `\n\n---\n\n*${turn} turnos. Para cambiar ángulo: ¿cómo se relaciona con ${related[0]?.title || 'problemas relacionados'}?*` : ''
+    },
+    'ja-JP': {
+      title: `# 💬 ${turn}ターン目 · ${p.title}`,
+      disclaimer: '> *LLMが利用できません。公開データに基づく返信です。*',
+      h1: '## 🧒 子ども向け要約',
+      h2: '## 📐 厳密な記述',
+      h3: '## 🔥 なぜ難しいか',
+      h4: '## 🔗 関連問題 (参考)',
+      h5: `## 🧭 質問: 「${lastUser.slice(0, 100)}」`,
+      intro: '良い角度です。提案:',
+      tip1: `1. **サーベイを読む** — "${p.titleEn} survey 2024 2025 2026" を検索`,
+      tip2: `2. **学際的類推** — ${related[0]?.title || '関連問題'}と比較`,
+      tip3: '3. **計算・実験** — 数値計算で探れる',
+      tip4: '4. **分解** — 検証可能なサブプロブレムに',
+      h6: '## 🎯 次のステップ',
+      next1: '- 詳細を提供',
+      next2: '- 知っている論文を引用',
+      next3: '- サブプロブレムが必要?',
+      footer: (turn > 3) ? `\n\n---\n\n*${turn}ターン。角度を変えるには: ${related[0]?.title || '関連問題'}との関係は?*` : ''
+    }
+  };
+
+  const t = I18N[lang] || I18N['en-US'];
+  return [
+    t.title, '',
+    t.disclaimer, '',
+    t.h1, '', p.kid, '',
+    t.h2, '', p.formal, '',
+    t.h3, '', p.whyHard, '',
+    t.h4, '', relatedText, '',
+    t.h5, '',
+    t.intro, '',
+    t.tip1, t.tip2, t.tip3, t.tip4, '',
+    t.h6, '',
+    t.next1, t.next2, t.next3,
+    t.footer
+  ].join('\n');
 }
 
 // =============== 公开 API ===============
@@ -613,6 +759,7 @@ function localRoute(path, opts = {}) {
     '/chain/transactions': 'transactions',
     '/ai/solve': 'solve',
     '/ai/evaluate': 'evaluate',
+    '/ai/chat': 'chat',
     '/health': 'health'
   };
 
@@ -639,6 +786,7 @@ function localRoute(path, opts = {}) {
     validate: () => localImpl.validate(),
     solve: () => localImpl.solve(body),
     evaluate: () => localImpl.evaluate(body),
+    chat: () => localImpl.chat(body),
     me: () => localImpl.me(),
     registerUser: () => localImpl.register(body),
     loginUser: () => localImpl.login(body),
@@ -727,6 +875,7 @@ export const api = {
   validate: () => request('/chain/validate'),
   solve: (problemId, userInput) => request('/ai/solve', { method: 'POST', body: { problem_id: problemId, user_input: userInput } }),
   evaluate: (problemId, content) => request('/ai/evaluate', { method: 'POST', body: { problem_id: problemId, content } }),
+  chat: (problemId, messages, lang) => request('/ai/chat', { method: 'POST', body: { problem_id: problemId, messages, lang } }),
 
   // 模式探测
   isLocalMode: () => !backendAvailable,
