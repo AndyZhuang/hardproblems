@@ -13,7 +13,7 @@ const __dirname = dirname(__filename);
 const DATA_DIR = config.dataDir;
 if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
-const TABLES = ['users', 'sessions', 'solutions', 'votes', 'transactions', 'blocks', 'chain_meta'];
+const TABLES = ['users', 'sessions', 'solutions', 'votes', 'transactions', 'blocks', 'chain_meta', 'discussions', 'roadmaps', 'teams', 'team_members', 'discussion_votes', 'roadmap_reactions'];
 const stores = {};
 for (const name of TABLES) {
   const path = join(DATA_DIR, `${name}.json`);
@@ -168,6 +168,110 @@ export const ChainMeta = {
     if (existing) { existing.value = v; markDirty('chain_meta'); }
     else insert('chain_meta', { key: k, value: v });
   }
+};
+
+// =============== Discussions (问题讨论) ===============
+// 每条讨论是顶层帖（parent_id=null）或回复（parent_id=某帖 id）
+export const Discussions = {
+  all: () => all('discussions'),
+  byId: (id) => findBy('discussions', 'id', id),
+  byProblem: (pid) => findAllBy('discussions', 'problem_id', pid)
+    .sort((a, b) => a.created_at - b.created_at),
+  topLevelByProblem: (pid) => findAllBy('discussions', 'problem_id', pid)
+    .filter(d => !d.parent_id)
+    .sort((a, b) => b.created_at - a.created_at),
+  repliesOf: (parentId) => findAllBy('discussions', 'parent_id', parentId)
+    .sort((a, b) => a.created_at - b.created_at),
+  countByProblem: (pid) => findAllBy('discussions', 'problem_id', pid).length,
+  create: (d) => { insert('discussions', d); return d; },
+  update: (id, patch) => update('discussions', 'id', id, patch),
+  remove: (id) => remove('discussions', 'id', id),
+  withUser: (rows) => rows.map(d => {
+    const u = findBy('users', 'id', d.user_id) || {};
+    return {
+      ...d,
+      username: u.username,
+      wallet_address: u.wallet_address,
+      avatar: u.avatar
+    };
+  })
+};
+
+// =============== DiscussionVotes (讨论点赞) ===============
+export const DiscussionVotes = {
+  byDiscussion: (did) => findAllBy('discussion_votes', 'discussion_id', did),
+  byDiscussionAndUser: (did, uid) => findAllBy('discussion_votes', 'discussion_id', did).find(v => v.user_id === uid),
+  create: (v) => { insert('discussion_votes', v); return v; },
+  update: (id, patch) => update('discussion_votes', 'id', id, patch),
+  remove: (id) => remove('discussion_votes', 'id', id),
+  countFor: (did) => {
+    const all = findAllBy('discussion_votes', 'discussion_id', did);
+    return { up: all.filter(v => v.value === 1).length, down: all.filter(v => v.value === -1).length };
+  }
+};
+
+// =============== Roadmaps (路线图 / 进展条目) ===============
+// 每个问题有一个时间线上的进展条目列表
+export const Roadmaps = {
+  all: () => all('roadmaps'),
+  byId: (id) => findBy('roadmaps', 'id', id),
+  byProblem: (pid) => findAllBy('roadmaps', 'problem_id', pid)
+    .sort((a, b) => a.created_at - b.created_at),
+  byStatus: (pid, status) => findAllBy('roadmaps', 'problem_id', pid)
+    .filter(r => r.status === status)
+    .sort((a, b) => a.created_at - b.created_at),
+  countByProblem: (pid) => findAllBy('roadmaps', 'problem_id', pid).length,
+  create: (r) => { insert('roadmaps', r); return r; },
+  update: (id, patch) => update('roadmaps', 'id', id, patch),
+  remove: (id) => remove('roadmaps', 'id', id),
+  withUser: (rows) => rows.map(r => {
+    const u = findBy('users', 'id', r.user_id) || {};
+    return {
+      ...r,
+      username: u.username,
+      wallet_address: u.wallet_address
+    };
+  })
+};
+
+// =============== RoadmapReactions (路线图条目反应) ===============
+export const RoadmapReactions = {
+  byRoadmap: (rid) => findAllBy('roadmap_reactions', 'roadmap_id', rid),
+  byRoadmapAndUser: (rid, uid) => findAllBy('roadmap_reactions', 'roadmap_id', rid).find(r => r.user_id === uid),
+  create: (r) => { insert('roadmap_reactions', r); return r; },
+  update: (id, patch) => update('roadmap_reactions', 'id', id, patch),
+  remove: (id) => remove('roadmap_reactions', 'id', id),
+  countFor: (rid) => findAllBy('roadmap_reactions', 'roadmap_id', rid).length
+};
+
+// =============== Teams (协作团队) ===============
+export const Teams = {
+  all: () => all('teams'),
+  byId: (id) => findBy('teams', 'id', id),
+  byProblem: (pid) => findAllBy('teams', 'problem_id', pid)
+    .sort((a, b) => b.created_at - a.created_at),
+  byUser: (uid) => findAllBy('team_members', 'user_id', uid)
+    .map(tm => findBy('teams', 'id', tm.team_id))
+    .filter(Boolean),
+  create: (t) => { insert('teams', t); return t; },
+  update: (id, patch) => update('teams', 'id', id, patch),
+  remove: (id) => remove('teams', 'id', id)
+};
+
+// =============== TeamMembers (团队成员) ===============
+export const TeamMembers = {
+  byTeam: (tid) => findAllBy('team_members', 'team_id', tid),
+  byUser: (uid) => findAllBy('team_members', 'user_id', uid),
+  byTeamAndUser: (tid, uid) => findAllBy('team_members', 'team_id', tid).find(tm => tm.user_id === uid),
+  add: (tm) => { insert('team_members', tm); return tm; },
+  update: (id, patch) => update('team_members', 'id', id, patch),
+  remove: (tid, uid) => {
+    stores['team_members'].rows = stores['team_members'].rows.filter(
+      r => !(r.team_id === tid && r.user_id === uid)
+    );
+    markDirty('team_members');
+  },
+  countByTeam: (tid) => findAllBy('team_members', 'team_id', tid).length
 };
 
 logger.info(`ready at ${DATA_DIR}`);

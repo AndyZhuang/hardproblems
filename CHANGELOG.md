@@ -5,6 +5,73 @@ All notable changes to HardProblems.World are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-08-08
+
+### 🤝 E 阶段 — 协作：讨论 + 路线图 + 团队
+
+**让硬问题变成集体活动**：每个问题有讨论区、路线图时间线、协作团队。
+
+### Added
+
+#### 后端 3 大模块
+
+- **Discussions**（`/api/discussions`）— 顶层帖 + 单层回复 + up/down 投票
+  - `GET ?problem=xxx` 列表（含回复聚合 + 当前用户视角的 myVote）
+  - `POST { problemId, content, parentId? }` 创建（顶层或回复）
+  - `PATCH /:id` / `DELETE /:id` 仅作者
+  - `POST /:id/vote { value: 1|-1|0 }` 投票（不能给自己投票）
+  - 删顶层帖时连带删除回复
+- **Roadmap**（`/api/roadmap`）— 时间线条目 + 6 种状态 + 5 种 emoji 反应
+  - 6 种状态：`proposed` / `exploring` / `in_progress` / `breakthrough` / `blocked` / `done`
+  - 5 种反应：`👍 like` / `🔥 fire` / `💡 bulb` / `🚀 rocket` / `👀 eyes`
+  - 同一反应二次点击 = 取消
+- **Teams**（`/api/teams`）— 协作团队 + 成员角色 + 贡献聚合
+  - 6 种角色：`leader` / `mentor` / `researcher` / `engineer` / `student` / `observer`
+  - 队长自动加入、不可退出（需先解散）
+  - 成员按角色排序（leader 优先）
+  - GET /:id 返回 contributions 列表（每人解答数 + 总积分）
+
+#### 前端 4 个组件
+
+- `DiscussionSection.jsx` — 线程式回复、投票按钮、登录提示、编辑/删除
+- `Roadmap.jsx` — 时间线 + 状态徽章 + emoji 反应行 + 状态切换下拉
+- `Teams.jsx` — 问题选择器 + 团队卡片网格 + 创建表单
+- `TeamDetail.jsx` — 团队头部 + 成员列表（带角色图标）+ 贡献表
+- 嵌入到 `ProblemDetail`：DiscussionSection、Roadmap + "想组队？"入口
+- 新路由：`/teams`、`/teams/:id`
+- 顶栏新增"团队"导航入口
+- 协作专属 CSS（~360 行）
+
+#### 数据层
+
+- `db.js` 新增 7 张 JSON 表：`discussions` / `discussion_votes` / `roadmaps` / `roadmap_reactions` / `teams` / `team_members`
+- 6 个查询 helper：`topLevelByProblem` / `repliesOf` / `byDiscussionAndUser` / `countFor` / `byRoadmapAndUser` / `countByTeam`
+- `localImpl`（IndexedDB）镜像全部方法（DB_VERSION 1 → 2）
+- IndexedDB 新增 6 个 store + 6 个复合索引（`discussion_user`、`roadmap_user`、`team_user` 等）
+- 前端支持 server + local 双模式
+
+#### i18n
+
+- 4 语言包（zh-CN / en-US / es-ES / ja-JP）各加 47 条协作文案
+- 顶栏 `nav.teams` 多语言翻译
+
+### Fixed
+
+- 时间格式化 `timeAgo()` 加防御（处理 undefined/NaN，避免 `RangeError: Invalid time value`）
+- server 返回统一 camelCase（前端期望 `createdAt` 不是 `created_at`）
+
+### Tests
+
+- `test_collab.cjs` — 后端 56 项断言全过（discussions 17 / roadmap 13 / teams 23 / 跨用户 3）
+- `test_collab_browser.cjs` — 前端 7 步全过（注册、UI 渲染、创建讨论、创建路线图、emoji 反应、Teams 页面、创建团队跳转）
+- 总测试 56+7 = 63 项
+
+### Build
+
+- main bundle: 470 KB（gzip 177 KB）+ 协作 CSS 8 KB
+- WalletButton 仍 lazy: 300 KB（gzip 92 KB）
+- 模 块 数 1273
+
 ## [1.3.1] - 2026-08-08
 
 ### 🌐 D 阶段收尾 — 多语言问题内容（Top 10 + 基础设施）

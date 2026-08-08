@@ -1,8 +1,8 @@
-{
+﻿{
   "name": "hardproblems",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "private": true,
-  "description": "HardProblems.World — AI-solvable hard problems with on-chain rewards. 64 hard problems across 8 disciplines, blockchain-based points, AI assistant.",
+  "description": "HardProblems.World 鈥?AI-solvable hard problems with on-chain rewards. 64 hard problems across 8 disciplines, blockchain-based points, AI assistant.",
   "author": "HardProblems.World Contributors",
   "license": "MIT",
   "engines": {

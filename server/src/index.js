@@ -18,6 +18,9 @@ import { router as solutionsRouter } from './routes/solutions.js';
 import { router as leaderboardRouter } from './routes/leaderboard.js';
 import { router as chainRouter } from './routes/chain.js';
 import { router as aiRouter } from './routes/ai.js';
+import { router as discussionsRouter } from './routes/discussions.js';
+import { router as roadmapRouter } from './routes/roadmap.js';
+import { router as teamsRouter } from './routes/teams.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -100,7 +103,10 @@ app.get('/api', (_req, res) => {
       leaderboard: '/api/leaderboard',
       chain: '/api/chain/info',
       ai_solve: 'POST /api/ai/solve',
-      ai_evaluate: 'POST /api/ai/evaluate'
+      ai_evaluate: 'POST /api/ai/evaluate',
+      discussions: 'GET/POST /api/discussions',
+      roadmap: 'GET/POST /api/roadmap',
+      teams: 'GET/POST /api/teams'
     }
   });
 });
@@ -143,6 +149,9 @@ app.use('/api/solutions', solutionsRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/chain', chainRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/discussions', discussionsRouter);
+app.use('/api/roadmap', roadmapRouter);
+app.use('/api/teams', teamsRouter);
 
 // 静态前端
 const clientDist = join(__dirname, '..', '..', 'client', 'dist');

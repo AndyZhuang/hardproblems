@@ -6,6 +6,8 @@ import { useI18n, t as i18nT } from '../lib/i18n.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
 import { PARTICIPATE_TYPES } from '../lib/problems.js';
 import { t } from '../lib/i18n.js';
+import DiscussionSection from '../components/DiscussionSection.jsx';
+import Roadmap from '../components/Roadmap.jsx';
 
 const DIFFICULTY_LABEL = ['', '入门', '简单', '中等', '困难', '极难'];
 const STATUS_LABEL = { open: '未解', partially_solved: '部分', solved: '已解' };
@@ -450,6 +452,30 @@ export default function ProblemDetail() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* 路线图时间线 */}
+          <div className="card">
+            <Roadmap problemId={problem.id} />
+          </div>
+
+          {/* 协作：讨论 + 团队入口 */}
+          <div className="card">
+            <DiscussionSection problemId={problem.id} />
+          </div>
+
+          <div className="card bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 border-emerald-500/20">
+            <h3 className="text-lg font-display font-bold text-emerald-200 mb-2">🤝 想组队解答？</h3>
+            <p className="text-sm text-slate-300 mb-3">
+              在 <Link to={`/teams?problem=${problem.id}`} className="text-emerald-300 hover:text-emerald-200 underline">问题团队页</Link> 创建或加入一个团队。
+              队员的解答会汇总贡献。
+            </p>
+            <Link
+              to={`/teams?problem=${problem.id}`}
+              className="inline-block px-4 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 text-sm font-medium transition-colors"
+            >
+              查看团队 →
+            </Link>
           </div>
         </div>
 

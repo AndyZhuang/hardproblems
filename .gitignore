@@ -82,12 +82,17 @@ debug_*.cjs
 debug_*.js
 e2e_test*.cjs
 e2e_v*.cjs
+e2e_v*_out.txt
 screenshot_*.cjs
 perf_audit.cjs
 pack.cjs
 test_*.cjs
 test_*.js
 check_*.js
+server/server.err
+server/server.log
+spa.log
+spa.err
 
 # ===== Python =====
 deploy/__pycache__/

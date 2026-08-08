@@ -25,7 +25,7 @@ async function checkBackend() {
 
 // =============== IndexedDB 封装 ===============
 const DB_NAME = 'hpw_frontend';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let dbInstance = null;
 
 function openDB() {
@@ -47,6 +47,35 @@ function openDB() {
       if (!db.objectStoreNames.contains('votes')) {
         const s = db.createObjectStore('votes', { keyPath: 'id' });
         s.createIndex('solution_user', ['solution_id', 'user_id'], { unique: true });
+      }
+      // v1.4.0 协作
+      if (!db.objectStoreNames.contains('discussions')) {
+        const s = db.createObjectStore('discussions', { keyPath: 'id' });
+        s.createIndex('problem_id', 'problem_id', { unique: false });
+        s.createIndex('parent_id', 'parent_id', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('discussion_votes')) {
+        const s = db.createObjectStore('discussion_votes', { keyPath: 'id' });
+        s.createIndex('discussion_user', ['discussion_id', 'user_id'], { unique: true });
+      }
+      if (!db.objectStoreNames.contains('roadmaps')) {
+        const s = db.createObjectStore('roadmaps', { keyPath: 'id' });
+        s.createIndex('problem_id', 'problem_id', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('roadmap_reactions')) {
+        const s = db.createObjectStore('roadmap_reactions', { keyPath: 'id' });
+        s.createIndex('roadmap_user', ['roadmap_id', 'user_id'], { unique: true });
+      }
+      if (!db.objectStoreNames.contains('teams')) {
+        const s = db.createObjectStore('teams', { keyPath: 'id' });
+        s.createIndex('problem_id', 'problem_id', { unique: false });
+        s.createIndex('name_problem', ['name', 'problem_id'], { unique: true });
+      }
+      if (!db.objectStoreNames.contains('team_members')) {
+        const s = db.createObjectStore('team_members', { keyPath: 'id' });
+        s.createIndex('team_user', ['team_id', 'user_id'], { unique: true });
+        s.createIndex('team_id', 'team_id', { unique: false });
+        s.createIndex('user_id', 'user_id', { unique: false });
       }
     };
     req.onsuccess = () => { dbInstance = req.result; resolve(req.result); };
@@ -469,6 +498,319 @@ const localImpl = {
       lang: lang || 'zh-CN',
       turn: (messages || []).filter(m => m.role === 'user').length
     });
+  },
+
+  // =============== 协作 v1.4.0 ===============
+  // Discussions
+  async listDiscussions(problemId) {
+    const all = await dbAllByIndex('discussions', 'problem_id', problemId);
+    const top = all.filter(d => !d.parent_id).sort((a, b) => b.created_at - a.created_at);
+    const users = await dbAll('users');
+    const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+    const enriched = [];
+    for (const t of top) {
+      const replies = all.filter(d => d.parent_id === t.id).sort((a, b) => a.created_at - b.created_at);
+      const votes = (await dbAllByIndex('discussion_votes', 'discussion_user', IDBKeyRange.bound([t.id, ''], [t.id, '\uffff'])))
+        || (await dbAll('discussion_votes'));
+      const tVotes = (await dbAll('discussion_votes')).filter(v => v.discussion_id === t.id);
+      const up = tVotes.filter(v => v.value === 1).length;
+      const down = tVotes.filter(v => v.value === -1).length;
+      let myVote = 0;
+      const token = localStorage.getItem('hpw_token');
+      if (token) {
+        const sess = await dbGet('sessions', token);
+        const my = tVotes.find(v => v.user_id === sess?.user_id);
+        if (my) myVote = my.value;
+      }
+      const u = userMap[t.user_id] || {};
+      const replyView = replies.map(r => {
+        const ru = userMap[r.user_id] || {};
+        const rVotes = tVotes.filter(v => v.discussion_id === r.id);
+        return {
+          id: r.id, parentId: r.parent_id, content: r.content, createdAt: r.created_at, edited: !!r.edited_at,
+          user: { id: r.user_id, username: ru.username, avatar: ru.avatar },
+          votesUp: rVotes.filter(v => v.value === 1).length,
+          votesDown: rVotes.filter(v => v.value === -1).length
+        };
+      });
+      enriched.push({
+        id: t.id, problemId: t.problem_id, content: t.content, createdAt: t.created_at, edited: !!t.edited_at,
+        user: { id: t.user_id, username: u.username, avatar: u.avatar },
+        votesUp: up, votesDown: down, myVote,
+        replyCount: replies.length, replies: replyView
+      });
+    }
+    return { discussions: enriched, total: all.length };
+  },
+  async createDiscussion({ problemId, content, parentId = null }) {
+    if (!problemId) throw new Error('problemId 必填');
+    if (!content || !content.trim()) throw new Error('内容不能为空');
+    if (content.length > 4000) content = content.slice(0, 4000);
+    if (parentId) {
+      const parent = await dbGet('discussions', parentId);
+      if (!parent) throw new Error('父帖不存在');
+      if (parent.problem_id !== problemId) throw new Error('父帖不属于此问题');
+      if (parent.parent_id) throw new Error('不支持多层嵌套');
+    }
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    const id = genId(12);
+    const row = { id, problem_id: problemId, user_id: sess.user_id, parent_id: parentId, content: content.trim(), created_at: Date.now() };
+    await dbPut('discussions', row);
+    return { ok: true, discussion: { id, parentId, content: row.content, createdAt: row.created_at } };
+  },
+  async editDiscussion(id, content) {
+    if (!content || !content.trim()) throw new Error('内容不能为空');
+    const d = await dbGet('discussions', id);
+    if (!d) throw new Error('讨论不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (d.user_id !== sess?.user_id) throw new Error('只能编辑自己的讨论');
+    d.content = content.trim();
+    d.edited_at = Date.now();
+    await dbPut('discussions', d);
+    return { ok: true };
+  },
+  async deleteDiscussion(id) {
+    const d = await dbGet('discussions', id);
+    if (!d) throw new Error('讨论不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (d.user_id !== sess?.user_id) throw new Error('只能删除自己的讨论');
+    if (!d.parent_id) {
+      // 顶层帖：删所有回复
+      const replies = await dbAllByIndex('discussions', 'parent_id', id);
+      for (const r of replies) await dbDelete('discussions', r.id);
+    }
+    await dbDelete('discussions', id);
+    return { ok: true };
+  },
+  async voteDiscussion(id, value) {
+    if (![1, -1, 0].includes(value)) throw new Error('value must be 1, -1, 0');
+    const d = await dbGet('discussions', id);
+    if (!d) throw new Error('讨论不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    if (d.user_id === sess.user_id) throw new Error('不能给自己的讨论投票');
+    const all = await dbAll('discussion_votes');
+    const existing = all.find(v => v.discussion_id === id && v.user_id === sess.user_id);
+    if (value === 0) {
+      if (existing) await dbDelete('discussion_votes', existing.id);
+    } else if (existing) {
+      existing.value = value;
+      existing.updated_at = Date.now();
+      await dbPut('discussion_votes', existing);
+    } else {
+      await dbPut('discussion_votes', { id: genId(10), discussion_id: id, user_id: sess.user_id, value, created_at: Date.now() });
+    }
+    const after = (await dbAll('discussion_votes')).filter(v => v.discussion_id === id);
+    return { ok: true, votesUp: after.filter(v => v.value === 1).length, votesDown: after.filter(v => v.value === -1).length, myVote: value };
+  },
+
+  // Roadmaps
+  async listRoadmap(problemId) {
+    const all = await dbAllByIndex('roadmaps', 'problem_id', problemId);
+    all.sort((a, b) => a.created_at - b.created_at);
+    const users = await dbAll('users');
+    const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+    const allReactions = await dbAll('roadmap_reactions');
+    const token = localStorage.getItem('hpw_token');
+    const sess = token ? await dbGet('sessions', token) : null;
+    const viewerId = sess?.user_id;
+    const enriched = all.map(r => {
+      const re = allReactions.filter(x => x.roadmap_id === r.id);
+      const u = userMap[r.user_id] || {};
+      const counts = { like: 0, fire: 0, bulb: 0, rocket: 0, eyes: 0 };
+      const mine = new Set();
+      for (const x of re) {
+        if (counts[x.value] !== undefined) counts[x.value]++;
+        if (viewerId && x.user_id === viewerId) mine.add(x.value);
+      }
+      return {
+        id: r.id, problemId: r.problem_id, title: r.title, description: r.description,
+        status: r.status, createdAt: r.created_at, statusChangedAt: r.status_changed_at,
+        user: { id: r.user_id, username: u.username },
+        reactions: counts, myReactions: [...mine]
+      };
+    });
+    return { entries: enriched, total: all.length };
+  },
+  async createRoadmap({ problemId, title, description = '', status = 'proposed' }) {
+    if (!problemId) throw new Error('problemId 必填');
+    if (!title || !title.trim()) throw new Error('标题不能为空');
+    const VALID = ['proposed', 'exploring', 'in_progress', 'breakthrough', 'blocked', 'done'];
+    if (!VALID.includes(status)) status = 'proposed';
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    const id = genId(12);
+    const row = { id, problem_id: problemId, user_id: sess.user_id, title: title.trim().slice(0, 120), description: (description || '').slice(0, 1000), status, created_at: Date.now() };
+    await dbPut('roadmaps', row);
+    return { ok: true, entry: { id, problemId, title: row.title, description: row.description, status, createdAt: row.created_at } };
+  },
+  async updateRoadmap(id, patch) {
+    const r = await dbGet('roadmaps', id);
+    if (!r) throw new Error('条目不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (r.user_id !== sess?.user_id) throw new Error('只能编辑自己的条目');
+    const VALID = ['proposed', 'exploring', 'in_progress', 'breakthrough', 'blocked', 'done'];
+    if (patch.title !== undefined) r.title = String(patch.title).trim().slice(0, 120) || r.title;
+    if (patch.description !== undefined) r.description = String(patch.description).slice(0, 1000);
+    if (patch.status !== undefined) {
+      if (!VALID.includes(patch.status)) throw new Error('status 无效');
+      r.status = patch.status;
+      r.status_changed_at = Date.now();
+    }
+    await dbPut('roadmaps', r);
+    return { ok: true };
+  },
+  async deleteRoadmap(id) {
+    const r = await dbGet('roadmaps', id);
+    if (!r) throw new Error('条目不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (r.user_id !== sess?.user_id) throw new Error('只能删除自己的条目');
+    await dbDelete('roadmaps', id);
+    return { ok: true };
+  },
+  async reactRoadmap(id, value) {
+    const r = await dbGet('roadmaps', id);
+    if (!r) throw new Error('条目不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    const VALID = ['like', 'fire', 'bulb', 'rocket', 'eyes'];
+    const all = await dbAll('roadmap_reactions');
+    const existing = all.find(x => x.roadmap_id === id && x.user_id === sess.user_id);
+    if (value === null || value === '' || value === undefined) {
+      if (existing) await dbDelete('roadmap_reactions', existing.id);
+      return { ok: true };
+    }
+    if (!VALID.includes(value)) throw new Error('reaction 无效');
+    if (existing && existing.value === value) {
+      await dbDelete('roadmap_reactions', existing.id);
+    } else if (existing) {
+      existing.value = value;
+      existing.updated_at = Date.now();
+      await dbPut('roadmap_reactions', existing);
+    } else {
+      await dbPut('roadmap_reactions', { id: genId(10), roadmap_id: id, user_id: sess.user_id, value, created_at: Date.now() });
+    }
+    return { ok: true };
+  },
+
+  // Teams
+  async listTeams(problemId) {
+    const all = await dbAllByIndex('teams', 'problem_id', problemId);
+    all.sort((a, b) => b.created_at - a.created_at);
+    const token = localStorage.getItem('hpw_token');
+    const sess = token ? await dbGet('sessions', token) : null;
+    const out = [];
+    for (const t of all) {
+      const members = await dbAllByIndex('team_members', 'team_id', t.id);
+      out.push({
+        id: t.id, problemId: t.problem_id, name: t.name, description: t.description,
+        leaderId: t.leader_id, createdAt: t.created_at,
+        memberCount: members.length,
+        isMember: sess ? members.some(m => m.user_id === sess.user_id) : false,
+        isLeader: sess ? t.leader_id === sess.user_id : false
+      });
+    }
+    return { teams: out, total: all.length };
+  },
+  async createTeam({ problemId, name, description = '' }) {
+    if (!problemId) throw new Error('problemId 必填');
+    if (!name || !name.trim()) throw new Error('团队名不能为空');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    const all = await dbAllByIndex('teams', 'problem_id', problemId);
+    if (all.find(t => t.name === name.trim())) throw new Error('该问题下已存在同名团队');
+    const id = genId(12);
+    const t = { id, problem_id: problemId, name: name.trim().slice(0, 60), description: (description || '').slice(0, 500), leader_id: sess.user_id, created_at: Date.now() };
+    await dbPut('teams', t);
+    await dbPut('team_members', { id: genId(10), team_id: id, user_id: sess.user_id, role: 'leader', joined_at: Date.now() });
+    return { ok: true, team: { id, name: t.name, problemId, description: t.description, leaderId: t.leader_id, createdAt: t.created_at, memberCount: 1, isMember: true, isLeader: true } };
+  },
+  async getTeam(id) {
+    const t = await dbGet('teams', id);
+    if (!t) throw new Error('团队不存在');
+    const members = await dbAllByIndex('team_members', 'team_id', id);
+    const users = await dbAll('users');
+    const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+    const sols = await dbAll('solutions');
+    const token = localStorage.getItem('hpw_token');
+    const sess = token ? await dbGet('sessions', token) : null;
+    const roleOrder = { leader: 0, mentor: 1, researcher: 2, engineer: 3, student: 4, observer: 5 };
+    const enriched = members.map(m => {
+      const u = userMap[m.user_id] || {};
+      const us = sols.filter(s => s.user_id === m.user_id);
+      return {
+        userId: m.user_id, username: u.username, avatar: u.avatar, wallet: u.wallet_address,
+        role: m.role, joinedAt: m.joined_at,
+        solutionsCount: us.length, totalScore: us.reduce((s, x) => s + (x.score_awarded || 0), 0)
+      };
+    }).sort((a, b) => (roleOrder[a.role] ?? 9) - (roleOrder[b.role] ?? 9));
+    return {
+      team: {
+        id: t.id, problemId: t.problem_id, name: t.name, description: t.description,
+        leaderId: t.leader_id, createdAt: t.created_at,
+        memberCount: members.length, members: enriched,
+        isMember: sess ? members.some(m => m.user_id === sess.user_id) : false,
+        isLeader: sess ? t.leader_id === sess.user_id : false
+      }
+    };
+  },
+  async joinTeam(id, role = 'researcher') {
+    const VALID = ['leader', 'researcher', 'engineer', 'student', 'mentor', 'observer'];
+    if (!VALID.includes(role)) role = 'researcher';
+    const t = await dbGet('teams', id);
+    if (!t) throw new Error('团队不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    const all = await dbAllByIndex('team_members', 'team_id', id);
+    if (all.find(m => m.user_id === sess.user_id)) throw new Error('你已经在该团队中');
+    await dbPut('team_members', { id: genId(10), team_id: id, user_id: sess.user_id, role, joined_at: Date.now() });
+    return { ok: true };
+  },
+  async leaveTeam(id) {
+    const t = await dbGet('teams', id);
+    if (!t) throw new Error('团队不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (!sess) throw new Error('请先登录');
+    if (t.leader_id === sess.user_id) throw new Error('队长不能直接退出');
+    const all = await dbAllByIndex('team_members', 'team_id', id);
+    const m = all.find(x => x.user_id === sess.user_id);
+    if (!m) throw new Error('你不在该团队中');
+    await dbDelete('team_members', m.id);
+    return { ok: true };
+  },
+  async updateTeam(id, patch) {
+    const t = await dbGet('teams', id);
+    if (!t) throw new Error('团队不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (t.leader_id !== sess?.user_id) throw new Error('只有队长可以编辑团队信息');
+    if (patch.name !== undefined) t.name = String(patch.name).trim().slice(0, 60) || t.name;
+    if (patch.description !== undefined) t.description = String(patch.description).slice(0, 500);
+    await dbPut('teams', t);
+    return { ok: true };
+  },
+  async disbandTeam(id) {
+    const t = await dbGet('teams', id);
+    if (!t) throw new Error('团队不存在');
+    const token = localStorage.getItem('hpw_token');
+    const sess = await dbGet('sessions', token);
+    if (t.leader_id !== sess?.user_id) throw new Error('只有队长可以解散团队');
+    const all = await dbAllByIndex('team_members', 'team_id', id);
+    for (const m of all) await dbDelete('team_members', m.id);
+    await dbDelete('teams', id);
+    return { ok: true };
   }
 };
 
@@ -760,7 +1102,10 @@ function localRoute(path, opts = {}) {
     '/ai/solve': 'solve',
     '/ai/evaluate': 'evaluate',
     '/ai/chat': 'chat',
-    '/health': 'health'
+    '/health': 'health',
+    '/discussions': 'listDiscussions',
+    '/roadmap': 'listRoadmap',
+    '/teams': 'listTeams'
   };
 
   // localApi 现在只依赖 const 变量（method/body/params/segs）和 _state（mutable），
@@ -799,6 +1144,44 @@ function localRoute(path, opts = {}) {
       }
       if (_state.id) return localImpl.getUser(_state.id);
       throw new Error('users route invalid');
+    },
+    // v1.4.0 协作
+    listDiscussions: () => localImpl.listDiscussions(params?.problem || params?.problemId),
+    discussions: () => {
+      // POST /discussions 或 PATCH/DELETE /discussions/:id
+      if (method === 'POST') return localImpl.createDiscussion(body);
+      // 3 段 /discussions/:id/vote
+      if (seg2 === 'vote') return localImpl.voteDiscussion(_state.id, body && body.value);
+      // PATCH/DELETE /discussions/:id 走 fallback
+      if (method === 'PATCH') return localImpl.editDiscussion(_state.id, body?.content);
+      if (method === 'DELETE') return localImpl.deleteDiscussion(_state.id);
+      throw new Error('discussions route invalid');
+    },
+    listRoadmap: () => localImpl.listRoadmap(params?.problem || params?.problemId),
+    roadmap: () => {
+      if (method === 'POST') return localImpl.createRoadmap(body);
+      if (seg2 === 'react') return localImpl.reactRoadmap(_state.id, body?.value);
+      if (method === 'PATCH') return localImpl.updateRoadmap(_state.id, body);
+      if (method === 'DELETE') return localImpl.deleteRoadmap(_state.id);
+      throw new Error('roadmap route invalid');
+    },
+    listTeams: () => localImpl.listTeams(params?.problem || params?.problemId),
+    teams: () => {
+      // GET /teams/:id
+      if (method === 'GET' && _state.id && !seg2) return localImpl.getTeam(_state.id);
+      // POST /teams
+      if (method === 'POST' && !_state.id) return localImpl.createTeam(body);
+      // POST /teams/:id/join, /teams/:id/leave
+      if (seg2 === 'join') return localImpl.joinTeam(_state.id, body?.role);
+      if (seg2 === 'leave') return localImpl.leaveTeam(_state.id);
+      // PATCH /teams/:id 或 /teams/:id/members/:userId
+      if (method === 'PATCH' && seg2 === 'members') {
+        // 不在 localImpl 里实现，简化为忽略
+        return { ok: true, note: 'role update not supported in local mode' };
+      }
+      if (method === 'PATCH') return localImpl.updateTeam(_state.id, body);
+      if (method === 'DELETE') return localImpl.disbandTeam(_state.id);
+      throw new Error('teams route invalid');
     }
   };
 
@@ -817,6 +1200,53 @@ function localRoute(path, opts = {}) {
   if (segs.length === 3 && seg0 === 'solutions') {
     if (seg2 === 'vote') return localImpl.vote(seg1, body && body.value);
     if (seg2 === 'my-vote') return localImpl.myVote(seg1);
+  }
+  // v1.4.0 协作 - 3 段路径
+  if (seg0 === 'discussions') {
+    if (segs.length === 1) {
+      // POST /discussions
+      if (method === 'POST') return localImpl.createDiscussion(body);
+      // GET /discussions?problem=xxx
+      return localImpl.listDiscussions(params?.problem || params?.problemId);
+    }
+    if (segs.length === 3) {
+      if (seg2 === 'vote') return localImpl.voteDiscussion(seg1, body && body.value);
+    }
+    if (segs.length === 2) {
+      if (method === 'PATCH') return localImpl.editDiscussion(seg1, body?.content);
+      if (method === 'DELETE') return localImpl.deleteDiscussion(seg1);
+    }
+  }
+  if (seg0 === 'roadmap') {
+    if (segs.length === 1) {
+      if (method === 'POST') return localImpl.createRoadmap(body);
+      return localImpl.listRoadmap(params?.problem || params?.problemId);
+    }
+    if (segs.length === 3 && seg2 === 'react') {
+      return localImpl.reactRoadmap(seg1, body?.value);
+    }
+    if (segs.length === 2) {
+      if (method === 'PATCH') return localImpl.updateRoadmap(seg1, body);
+      if (method === 'DELETE') return localImpl.deleteRoadmap(seg1);
+    }
+  }
+  if (seg0 === 'teams') {
+    if (segs.length === 1) {
+      if (method === 'POST') return localImpl.createTeam(body);
+      return localImpl.listTeams(params?.problem || params?.problemId);
+    }
+    if (segs.length === 2) {
+      if (method === 'GET') return localImpl.getTeam(seg1);
+      if (method === 'PATCH') return localImpl.updateTeam(seg1, body);
+      if (method === 'DELETE') return localImpl.disbandTeam(seg1);
+    }
+    if (segs.length === 3) {
+      if (seg2 === 'join') return localImpl.joinTeam(seg1, body?.role);
+      if (seg2 === 'leave') return localImpl.leaveTeam(seg1);
+    }
+    if (segs.length === 4 && seg2 === 'members') {
+      return { ok: true, note: 'role update not supported in local mode' };
+    }
   }
 
   // 简单路由器
@@ -876,6 +1306,34 @@ export const api = {
   solve: (problemId, userInput) => request('/ai/solve', { method: 'POST', body: { problem_id: problemId, user_input: userInput } }),
   evaluate: (problemId, content) => request('/ai/evaluate', { method: 'POST', body: { problem_id: problemId, content } }),
   chat: (problemId, messages, lang) => request('/ai/chat', { method: 'POST', body: { problem_id: problemId, messages, lang } }),
+
+  // v1.4.0 协作
+  listDiscussions: (problemId) => {
+    const q = new URLSearchParams({ problem: problemId }).toString();
+    return request('/discussions?' + q);
+  },
+  createDiscussion: (data) => request('/discussions', { method: 'POST', body: data }),
+  editDiscussion: (id, content) => request('/discussions/' + id, { method: 'PATCH', body: { content } }),
+  deleteDiscussion: (id) => request('/discussions/' + id, { method: 'DELETE' }),
+  voteDiscussion: (id, value) => request('/discussions/' + id + '/vote', { method: 'POST', body: { value } }),
+  listRoadmap: (problemId) => {
+    const q = new URLSearchParams({ problem: problemId }).toString();
+    return request('/roadmap?' + q);
+  },
+  createRoadmap: (data) => request('/roadmap', { method: 'POST', body: data }),
+  updateRoadmap: (id, patch) => request('/roadmap/' + id, { method: 'PATCH', body: patch }),
+  deleteRoadmap: (id) => request('/roadmap/' + id, { method: 'DELETE' }),
+  reactRoadmap: (id, value) => request('/roadmap/' + id + '/react', { method: 'POST', body: { value } }),
+  listTeams: (problemId) => {
+    const q = new URLSearchParams({ problem: problemId }).toString();
+    return request('/teams?' + q);
+  },
+  createTeam: (data) => request('/teams', { method: 'POST', body: data }),
+  getTeam: (id) => request('/teams/' + id),
+  joinTeam: (id, role) => request('/teams/' + id + '/join', { method: 'POST', body: { role } }),
+  leaveTeam: (id) => request('/teams/' + id + '/leave', { method: 'POST' }),
+  updateTeam: (id, patch) => request('/teams/' + id, { method: 'PATCH', body: patch }),
+  disbandTeam: (id) => request('/teams/' + id, { method: 'DELETE' }),
 
   // 模式探测
   isLocalMode: () => !backendAvailable,

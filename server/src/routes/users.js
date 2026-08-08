@@ -46,6 +46,17 @@ export function requireAuth(req, res, next) {
   next();
 }
 
+// 可选认证：有 token 就解析出 user，没有也不报错
+export function optionalAuth(req, _res, next) {
+  const token = req.headers.authorization?.replace('Bearer ', '') || req.cookies?.token;
+  if (!token) return next();
+  const payload = verifyToken(token);
+  if (!payload) return next();
+  const user = Users.byId(payload.uid);
+  if (user) req.user = user;
+  next();
+}
+
 // 输入验证
 function validateUsername(s) {
   if (typeof s !== 'string') return '用户名必须是字符串';

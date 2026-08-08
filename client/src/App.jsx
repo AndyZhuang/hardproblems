@@ -7,6 +7,8 @@ import Leaderboard from './pages/Leaderboard.jsx';
 import Chain from './pages/Chain.jsx';
 import Auth from './pages/Auth.jsx';
 import Profile from './pages/Profile.jsx';
+import Teams from './pages/Teams.jsx';
+import TeamDetail from './pages/TeamDetail.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 
@@ -19,6 +21,8 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="problems" element={<Problems />} />
           <Route path="problems/:id" element={<ProblemDetail />} />
+          <Route path="teams" element={<Teams />} />
+          <Route path="teams/:id" element={<TeamDetail />} />
           <Route path="leaderboard" element={<Leaderboard />} />
           <Route path="chain" element={<Chain />} />
           <Route path="chain/block/:id" element={<Chain />} />
